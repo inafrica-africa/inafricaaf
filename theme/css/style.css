@@ -408,6 +408,20 @@ a h4:hover {
   }
 }
 
+/* Below 992px the top-header's 3 col-lg-4 columns (WhatsApp / animated
+   text / social icons) stack into 3 rows instead of 1, so the fixed
+   header is taller than the desktop 180px offset accounts for. */
+@media (max-width: 991px) {
+  .below-fixed-header {
+    padding-top: 280px;
+  }
+}
+@media (max-width: 575px) {
+  .below-fixed-header {
+    padding-top: 320px;
+  }
+}
+
 .vertical-align-middle {
   vertical-align: middle;
 }

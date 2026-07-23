@@ -1,8 +1,8 @@
 <?php
 define('DB_SERVER', '127.0.0.1');
 define('DB_PORT', 3306);
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_USER', 'inafrica_app');
+define('DB_PASS', 'change_me');
 define('DB_NAME', 'inafrica');
 
 $con = mysqli_connect(DB_SERVER, DB_USER, DB_PASS, DB_NAME, DB_PORT);

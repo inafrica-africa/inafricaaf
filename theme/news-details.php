@@ -3,7 +3,7 @@ session_start();
 header('Content-Type: text/html; charset=utf-8');
 include('config.php');
 
-if (!isset($con) || !mysqli_ping($con)) {
+if (!isset($con)) {
     die("Database connection error: " . mysqli_connect_error());
 }
 
@@ -244,8 +244,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta property="og:type" content="article">
 <meta property="og:url" content="<?= $fullPostUrl ?>">
 <meta property="og:title" content="<?= htmlspecialchars($row['posttitle']) ?>">
-<meta property="og:description" content="<?= htmlspecialchars(mb_substr(strip_tags($row['postdetails']), 0, 297)) ?>">
-<meta property="og:image" content="<?= $siteUrl ?>admin/postimages/<?= htmlspecialchars($row['PostImage']) ?>">
+<meta property="og:description" content="<?= htmlspecialchars(mb_substr(strip_tags($row['postdetails'] ?? ''), 0, 297)) ?>">
+<?php $ogImage = !empty($row['PostImage']) ? $siteUrl . 'admin/postimages/' . htmlspecialchars($row['PostImage']) : $siteUrl . 'images/logo.png'; ?>
+<meta property="og:image" content="<?= $ogImage ?>">
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 
@@ -253,8 +254,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta property="twitter:card" content="summary_large_image">
 <meta property="twitter:url" content="<?= $fullPostUrl ?>">
 <meta property="twitter:title" content="<?= htmlspecialchars($row['posttitle']) ?>">
-<meta property="twitter:description" content="<?= htmlspecialchars(mb_substr(strip_tags($row['postdetails']), 0, 297)) ?>">
-<meta property="twitter:image" content="<?= $siteUrl ?>admin/postimages/<?= htmlspecialchars($row['PostImage']) ?>">
+<meta property="twitter:description" content="<?= htmlspecialchars(mb_substr(strip_tags($row['postdetails'] ?? ''), 0, 297)) ?>">
+<meta property="twitter:image" content="<?= $ogImage ?>">
 
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
@@ -442,10 +443,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $related_result = $related_query->get_result();
 
                         while ($related_post = $related_result->fetch_assoc()):
+                            $relatedThumb = $related_post['PostImage'] ? 'admin/postimages/' . htmlspecialchars($related_post['PostImage']) : 'images/blog/post-1.jpg';
                         ?>
                             <div class="col-md-4 mb-4">
                                 <a href="news-details.php?PostUrl=<?= urlencode($related_post['PostUrl']) ?>">
-                                    <img src="admin/postimages/<?= htmlspecialchars($related_post['PostImage']) ?>" alt="<?= htmlspecialchars($related_post['PostTitle']) ?>" class="img-fluid rounded mb-2">
+                                    <img src="<?= $relatedThumb ?>" alt="<?= htmlspecialchars($related_post['PostTitle']) ?>" class="img-fluid rounded mb-2">
                                     <h6 class="text-dark"><?= htmlspecialchars($related_post['PostTitle']) ?></h6>
                                 </a>
                                 <small class="text-muted"><?= date("F j, Y", strtotime($related_post['PostingDate'])) ?></small>

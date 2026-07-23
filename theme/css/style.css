@@ -482,6 +482,19 @@ header .top-header {
   overflow: hidden;
   transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
 }
+/* Below 992px the WhatsApp / ticker / social-icons columns stack into 3
+   rows instead of 1, so the 200px cap sized for desktop clips them. Same
+   content, same layout — just enough room for it to fully fit. */
+@media (max-width: 991px) {
+  header .top-header {
+    max-height: 260px;
+  }
+}
+@media (max-width: 575px) {
+  header .top-header {
+    max-height: 300px;
+  }
+}
 header .top-header.hide {
   max-height: 0;
   padding-top: 0;
@@ -698,31 +711,33 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
 
 
 
-/* Mobile adjustments */
+/* Mobile adjustments: keep the same brand yellow + green nav colors as
+   desktop (#mainNav .nav-link above), just adjust spacing for touch.
+   Sub-nav stays a single row and scrolls horizontally instead of
+   stacking vertically, which used to inflate the header's real height. */
 @media (max-width: 991px) {
-  #subNav .navbar-nav {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 0.75rem;
-  }
-}
-
-
-/* Mobile adjustments */
-@media (max-width: 991px) {
-  .navigation {
-    background: #1a1a37;
-  }
-
   #mainNav .nav-link {
-    color: #fff !important;
     padding: 10px 12px;
   }
 
+  #subNav {
+    float: none;
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  #subNav::-webkit-scrollbar {
+    display: none;
+  }
+
   #subNav .navbar-nav {
-    flex-direction: column;
-    text-align: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    justify-content: flex-start;
+    text-align: left;
     gap: 0.75rem;
   }
 }
@@ -985,6 +1000,15 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   right: 0;
 }
 
+/* On mobile, let touch swipe (already enabled by Slick's default swipe:true)
+   drive the slider instead of the arrow buttons cluttering the layout. */
+@media (max-width: 767px) {
+  .hero-slider .prevArrow,
+  .hero-slider .nextArrow {
+    display: none;
+  }
+}
+
 /* Dots for hero slider */
 .hero-slider .slick-dots {
   position: absolute;
@@ -1203,4 +1227,25 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
 .about-page .card {
   border: 1px solid #d8d8d8;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* ---------------- Post share buttons & follow-us icons ----------------
+   No custom spacing existed before; default inline-block Bootstrap
+   buttons could butt up against each other / wrap awkwardly on narrow
+   phone screens. Flex + wrap + gap keeps them evenly spaced at any width. */
+.social-share-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.social-share-buttons .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.social-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }

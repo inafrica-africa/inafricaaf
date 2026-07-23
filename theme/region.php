@@ -285,6 +285,10 @@ if ($activeRegion) {
               <div class="card h-100">
                 <?php if (!empty($post['PostImage'])): ?>
                   <img class="card-img-top" src="admin/postimages/<?= htmlspecialchars($post['PostImage']) ?>" alt="<?= htmlspecialchars($post['PostTitle']) ?>">
+                <?php else: ?>
+                  <div class="card-img-top post-image-placeholder d-flex align-items-center justify-content-center" style="height:160px;">
+                    <i class="ti-image"></i>
+                  </div>
                 <?php endif; ?>
                 <div class="card-body">
                   <p class="mb-1"><small><?= date('F j, Y', strtotime($post['PostingDate'])) ?></small></p>

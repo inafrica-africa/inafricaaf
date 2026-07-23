@@ -1,10 +1,11 @@
 <?php
+session_start();
 include('config.php');   ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php $siteUrl = 'https://hafinabuzz.com/'; ?>
+    <?php $siteUrl = 'https://inafricaac.org/'; ?>
     <meta charset="utf-8">
   <title>INAfrica Youth Initiative.</title>
 
@@ -42,20 +43,10 @@ include('config.php');   ?>
 
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content="article">
-<meta property="og:url" content="<?= $fullPostUrl ?>">
-<meta property="og:title" content="<?= htmlspecialchars($row['posttitle']) ?>">
-<meta property="og:description" content="<?= htmlspecialchars(mb_substr(strip_tags($row['postdetails']), 0, 297)) ?>">
-<meta property="og:image" content="<?= $siteUrl ?>admin/postimages/<?= htmlspecialchars($row['PostImage']) ?>">
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="<?= $fullPostUrl ?>">
-<meta property="twitter:title" content="<?= htmlspecialchars($row['posttitle']) ?>">
-<meta property="twitter:description" content="<?= htmlspecialchars(mb_substr(strip_tags($row['postdetails']), 0, 297)) ?>">
-<meta property="twitter:image" content="<?= $siteUrl ?>admin/postimages/<?= htmlspecialchars($row['PostImage']) ?>">
+<meta property="og:type" content="website">
+<meta property="og:url" content="<?= htmlspecialchars($siteUrl . 'subcategory.php' . (isset($_GET['subcatid']) ? '?subcatid=' . (int) $_GET['subcatid'] : '')) ?>">
+<meta property="og:title" content="INAfrica Youth Initiative">
+<meta property="og:image" content="<?= $siteUrl ?>images/logo.png">
 
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
@@ -116,27 +107,37 @@ $rowcount = mysqli_num_rows($query);
 $subcatName = "Subcategory";
 if (!empty($_SESSION['subcatid'])) {
     $subcatRow = mysqli_fetch_assoc(mysqli_query($con, "SELECT Subcategory FROM tblsubcategory WHERE SubCategoryId=" . $_SESSION['subcatid']));
-    $subcatName = $subcatRow['Subcategory'];
+    $subcatName = $subcatRow['Subcategory'] ?? 'Subcategory';
 }
 
 if ($rowcount == 0) {
     echo "<p>No records found under <strong>" . htmlentities($subcatName) . "</strong>.</p>";
 } else {
     echo "<h1>" . htmlentities($subcatName) . " Related News</h1>";
+    echo '<div class="row">';
     while ($row = mysqli_fetch_array($query)) {
 ?>
-        <div class="card mb-4">
-            <img class="card-img-top" src="admin/postimages/<?php echo htmlentities($row['PostImage']); ?>" alt="<?php echo htmlentities($row['posttitle']); ?>">
+        <div class="col-lg-4 col-sm-6 mb-4">
+        <div class="card h-100">
+            <?php if (!empty($row['PostImage'])): ?>
+                <img class="card-img-top" src="admin/postimages/<?php echo htmlentities($row['PostImage']); ?>" alt="<?php echo htmlentities($row['posttitle']); ?>">
+            <?php else: ?>
+                <div class="card-img-top post-image-placeholder d-flex align-items-center justify-content-center" style="height:160px;">
+                    <i class="ti-image"></i>
+                </div>
+            <?php endif; ?>
             <div class="card-body">
                 <p class="mb-1"><small>Posted on <?php echo htmlentities($row['postingdate']); ?></small></p>
-                <a href="/news/<?php echo urlencode($row['PostUrl']); ?>" class="text-decoration-none text-dark">
-                    <h2><?php echo htmlentities($row['posttitle']); ?></h2>
+                <a href="news-details.php?PostUrl=<?php echo urlencode($row['PostUrl']); ?>" class="text-decoration-none text-dark">
+                    <h2 class="h5"><?php echo htmlentities($row['posttitle']); ?></h2>
                 </a>
-                <a href="/news/<?php echo urlencode($row['PostUrl']); ?>" class="">Read More →</a>
+                <a href="news-details.php?PostUrl=<?php echo urlencode($row['PostUrl']); ?>">Read More →</a>
             </div>
+        </div>
         </div>
 <?php
     }
+    echo '</div>';
 }
 ?>
 

@@ -368,9 +368,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     
                     <div class="social-share-buttons text-center my-4">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($fullPostUrl) ?>" target="_blank" class="btn btn-primary"><i class="ti-facebook"></i> Share</a>
-                        <a href="https://twitter.com/intent/tweet?url=<?= urlencode($fullPostUrl) ?>&text=<?= urlencode($postTitle) ?>" target="_blank" class="btn btn-info"><i class="ti-twitter-alt"></i> Tweet</a>
-                        <a href="https://www.linkedin.com/shareArticle?mini=true&url=<?= urlencode($fullPostUrl) ?>&title=<?= urlencode($postTitle) ?>" target="_blank" class="btn btn-secondary"><i class="ti-linkedin"></i> Share</a>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($fullPostUrl) ?>" target="_blank" rel="noopener" class="btn btn-primary"><i class="ti-facebook"></i> Share</a>
+                        <a href="https://twitter.com/intent/tweet?url=<?= urlencode($fullPostUrl) ?>&text=<?= urlencode($postTitle) ?>" target="_blank" rel="noopener" class="btn btn-info"><i class="ti-twitter-alt"></i> Share on X</a>
+                        <a href="https://api.whatsapp.com/send?text=<?= urlencode($postTitle . ' ' . $fullPostUrl) ?>" target="_blank" rel="noopener" class="btn btn-success"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1a7.9 7.9 0 0 1-2.3-1.4 8.6 8.6 0 0 1-1.6-2c-.2-.3 0-.5.1-.6l.4-.5.2-.3a.6.6 0 0 0 0-.5c-.1-.1-.7-1.6-.9-2.2s-.5-.5-.7-.5h-.6a1.1 1.1 0 0 0-.8.4 3.4 3.4 0 0 0-1 2.5 5.9 5.9 0 0 0 1.3 3.1c.1.2 2.2 3.4 5.4 4.7a18.2 18.2 0 0 0 1.8.7 4.3 4.3 0 0 0 2 .1 3.3 3.3 0 0 0 2.1-1.5 2.6 2.6 0 0 0 .2-1.5c-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.3A10 10 0 1 0 12 2z"/></svg> Share</a>
                     </div>
                 </div>
 

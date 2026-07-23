@@ -1,0 +1,17 @@
+Thumbs.db
+.DS_Store
+.dist
+.tmp
+.sass-cache
+npm-debug.log
+node_modules
+package-lock.json
+yarn.lock
+netlify
+
+# Local DB credentials (each dev/environment has its own)
+theme/config.php
+theme/includes/config.php
+
+# Local Claude Code tool settings (per-developer)
+.claude/

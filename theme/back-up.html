@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Advanced Newsletter Editor (Updated)</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Construction Html5 Template">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="author" content="Themefisher">
+  <meta name="generator" content="Themefisher Educenter HTML Template v1.0">
+  <meta name="theme-name" content="educenter" />
+
+  <!-- ** Plugins Needed for the Project ** -->
+  <link rel="stylesheet" href="plugins/bootstrap/bootstrap.min.css">
+  <link rel="stylesheet" href="plugins/slick/slick.css">
+  <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
+  <link rel="stylesheet" href="plugins/animate/animate.css">
+  <link rel="stylesheet" href="plugins/aos/aos.css">
+  <link rel="stylesheet" href="plugins/venobox/venobox.css">
+
+  <!-- Main Stylesheet -->
+  <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+
+  <div class="content-page">
+    <!-- Start content -->
+    <div class="content">
+      <div class="container">
+        <!-- Page Title + Breadcrumbs -->
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="page-title-box">
+              <h4 class="page-title">Add Post</h4>
+              <ol class="breadcrumb p-0 m-0">
+                <li><a href="#">Post</a></li>
+                <li><a href="#">Add Post</a></li>
+                <li class="active">Add Post</li>
+              </ol>
+              <div class="clearfix"></div>
+            </div>
+          </div>
+        </div>
+        <!-- end row -->
+
+        <!-- Success / Error Messages -->
+        <div class="row">
+          <div class="col-sm-6">
+            <?php if (isset($msg)) { ?>
+            <div class="alert alert-success" role="alert">
+              <strong>Well done!</strong> <?php echo htmlentities($msg); ?>
+            </div>
+            <?php } ?>
+            <?php if (isset($error)) { ?>
+            <div class="alert alert-danger" role="alert">
+              <strong>Oh snap!</strong> <?php echo htmlentities($error); ?>
+            </div>
+            <?php } ?>
+          </div>
+        </div>
+
+        <!-- Add Post Form -->
+        <form name="addpost" method="post" class="row" enctype="multipart/form-data">
+          <!-- Title, Category, Subcategory -->
+          <div class="form-group col-md-6">
+            <label for="posttitle">Post Title</label>
+            <input type="text" class="form-control" id="posttitle" name="posttitle" placeholder="Enter title" required>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="category">Category</label>
+            <select class="form-control" name="category" id="category" onchange="getSubCat(this.value)" required>
+              <option value="">Select Category</option>
+              <?php
+                $ret = mysqli_query($con, "SELECT id, CategoryName FROM tblcategory WHERE Is_Active = 1");
+                while ($result = mysqli_fetch_array($ret)) { ?>
+                  <option value="<?php echo htmlentities($result['id']); ?>">
+                    <?php echo htmlentities($result['CategoryName']); ?>
+                  </option>
+              <?php } ?>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="subcategory">Sub Category</label>
+            <select class="form-control" name="subcategory" id="subcategory" required></select>
+          </div>
+
+          <!-- Post Details Card with Custom Editor -->
+          <div class="col-sm-12">
+            <div class="card-box">
+              <h4 class="m-b-30 m-t-0 header-title"><b>Post Details</b></h4>
+
+              <!-- Toolbar -->
+              <div id="toolbar" class="mb-2" role="toolbar" aria-label="Text formatting toolbar">
+                <!-- Basic formatting -->
+                <button type="button" onclick="format('bold')" title="Bold" aria-label="Bold"><b>B</b></button>
+                <button type="button" onclick="format('italic')" title="Italic" aria-label="Italic"><i>I</i></button>
+                <button type="button" onclick="format('underline')" title="Underline" aria-label="Underline"><u>U</u></button>
+                <button type="button" onclick="format('strikeThrough')" title="Strikethrough" aria-label="Strikethrough"><s>S</s></button>
+                <!-- Script -->
+                <button type="button" onclick="format('superscript')" title="Superscript" aria-label="Superscript">x²</button>
+                <button type="button" onclick="format('subscript')" title="Subscript" aria-label="Subscript">x₂</button>
+                <!-- Alignment -->
+                <button type="button" onclick="setAlignment('left')" title="Align Left" aria-label="Align Left">⬅️</button>
+                <button type="button" onclick="setAlignment('center')" title="Align Center" aria-label="Align Center">↔️</button>
+                <button type="button" onclick="setAlignment('right')" title="Align Right" aria-label="Align Right">➡️</button>
+                <button type="button" onclick="setAlignment('justify')" title="Justify" aria-label="Justify">☰</button>
+                <!-- Line Spacing -->
+                <select onchange="setLineHeight(this.value)" title="Line Spacing" aria-label="Line Spacing">
+                  <option value="">↕️</option>
+                  <option value="1">1</option>
+                  <option value="1.5">1.5</option>
+                  <option value="2">2</option>
+                  <option value="2.5">2.5</option>
+                  <option value="3">3</option>
+                </select>
+                <!-- Lists -->
+                <button type="button" onclick="format('insertOrderedList')" title="Ordered List" aria-label="Ordered List">🔢</button>
+                <button type="button" onclick="format('insertUnorderedList')" title="Bullet List" aria-label="Bullet List">•●•</button>
+                <!-- Inserts -->
+                <button type="button" onclick="insertLink()" title="Insert Link" aria-label="Insert Link">🔗</button>
+                <button type="button" onclick="uploadImage()" title="Insert Image" aria-label="Insert Image">🖼️</button>
+                <button type="button" onclick="uploadVideo()" title="Insert Video" aria-label="Insert Video">🎥</button>
+                <button type="button" onclick="insertHorizontalLine()" title="Horizontal Line" aria-label="Horizontal Line">―</button>
+                <button type="button" onclick="insertBlockquote()" title="Blockquote" aria-label="Blockquote">❝</button>
+                <button type="button" onclick="insertCodeBlock()" title="Code Block" aria-label="Code Block">&lt;/&gt;</button>
+                <button type="button" onclick="insertTable()" title="Insert Table" aria-label="Insert Table">🗒️</button>
+                <!-- Font -->
+                <select id="fontFamily" onchange="applyFontFamily()" title="Font Family" aria-label="Font Family">
+                  <option value="Arial">Arial</option>
+                  <option value="Courier New">Courier New</option>
+                  <option value="Georgia">Georgia</option>
+                  <option value="Times New Roman">Times New Roman</option>
+                  <option value="Verdana">Verdana</option>
+                </select>
+                <select id="fontSize" onchange="applyFontSize()" title="Font Size" aria-label="Font Size">
+                  <option value="12px">12px</option>
+                  <option value="14px">14px</option>
+                  <option value="16px" selected>16px</option>
+                  <option value="18px">18px</option>
+                  <option value="20px">20px</option>
+                  <option value="24px">24px</option>
+                </select>
+                <select onchange="applyHeading(this.value)" title="Heading Level" aria-label="Heading Level">
+                  <option value="">Heading</option>
+                  <option value="H1">H1</option>
+                  <option value="H2">H2</option>
+                  <option value="H3">H3</option>
+                  <option value="H4">H4</option>
+                  <option value="H5">H5</option>
+                  <option value="H6">H6</option>
+                </select>
+                <!-- Date/Time, Colors, Emojis -->
+                <button type="button" onclick="insertDateTime()" title="Insert Date/Time" aria-label="Insert Date/Time">🕒</button>
+                <button type="button" onclick="togglePicker('colorPicker', this)" title="Text Color" aria-label="Text Color">🎨</button>
+                <button type="button" onclick="togglePicker('bgColorPicker', this)" title="Background Color" aria-label="Background Color">🖌️</button>
+                <button type="button" onclick="togglePicker('emojiPicker', this)" title="Emoji Picker" aria-label="Emoji Picker">😊</button>
+                <!-- Undo/Redo/Clear -->
+                <button type="button" onclick="format('undo')" title="Undo" aria-label="Undo">↩️</button>
+                <button type="button" onclick="format('redo')" title="Redo" aria-label="Redo">↪️</button>
+                <button type="button" onclick="clearContent()" title="Clear Content" aria-label="Clear Content">🗑️</button>
+              </div>
+
+              <!-- Picker Panels -->
+              <div id="pickers">
+                <div id="colorPicker" class="picker-panel">
+                  <input type="color" onchange="applyTextColor(this.value)" aria-label="Choose text color">
+                </div>
+                <div id="bgColorPicker" class="picker-panel">
+                  <input type="color" onchange="applyBgColor(this.value)" aria-label="Choose background color">
+                </div>
+                <div id="emojiPicker" class="picker-panel emoji-grid" role="dialog" aria-label="Emoji picker">
+                  <button onclick="insertEmoji('😀')" type="button">😀</button>
+                  <button onclick="insertEmoji('😂')" type="button">😂</button>
+                  <button onclick="insertEmoji('😍')" type="button">😍</button>
+                  <button onclick="insertEmoji('😎')" type="button">😎</button>
+                  <button onclick="insertEmoji('😭')" type="button">😭</button>
+                  <button onclick="insertEmoji('👍')" type="button">👍</button>
+                  <button onclick="insertEmoji('🙏')" type="button">🙏</button>
+                  <button onclick="insertEmoji('💡')" type="button">💡</button>
+                  <button onclick="insertEmoji('🔥')" type="button">🔥</button>
+                  <button onclick="insertEmoji('🎉')" type="button">🎉</button>
+                </div>
+              </div>
+
+              <!-- Editable Area + Stats -->
+              <div id="editor" contenteditable="true" role="textbox" aria-multiline="true"></div>
+              <div id="stats">
+                <span id="wordCount">0</span> words,
+                <span id="charCount">0</span> chars
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature Image -->
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="card-box">
+                <h4 class="m-b-30 m-t-0 header-title"><b>Feature Image</b></h4>
+                <input type="file" class="form-control" id="postimage" name="postimage" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-group col-md-12">
+            <button type="submit" name="submit" class="btn btn-custom waves-effect waves-light btn-md">
+              Save The Post
+            </button>
+            <button type="button" class="btn btn-danger waves-effect waves-light">
+              Discard
+            </button>
+          </div>
+        </form>
+      </div>
+      <!-- container -->
+    </div>
+    <!-- content -->
+  </div>
+
+  <!-- jQuery, plugins, and scripts -->
+  <script src="plugins/jQuery/jquery.min.js"></script>
+  <script src="plugins/bootstrap/bootstrap.min.js"></script>
+  <script src="plugins/slick/slick.min.js"></script>
+  <script src="plugins/aos/aos.js"></script>
+  <script src="plugins/venobox/venobox.min.js"></script>
+  <script src="plugins/filterizr/jquery.filterizr.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcABaamniA6OL5YvYSpB3pFMNrXwXnLwU"></script>
+  <script src="plugins/google-map/gmap.js"></script>
+
+  <!-- Category → Subcategory AJAX handler -->
+  <script>
+    function getSubCat(val) {
+      $.post('get_subcategory.php', { catid: val }, data => {
+        $('#subcategory').html(data);
+      });
+    }
+  </script>
+
+  <!-- Main Editor Script -->
+  <script src="script.js"></script>
+</body>
+</html>

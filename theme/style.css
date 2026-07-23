@@ -1,0 +1,294 @@
+/* === Global Styles === */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h2 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+/* === Content‑Page Container (Bootstrap wrapper) === */
+.content-page {
+  padding: 20px 0;
+}
+.content-page .page-title-box h4 {
+  font-size: 1.5rem;
+  color: #222;
+}
+.content-page .breadcrumb li + li::before {
+  content: "›";
+  padding: 0 5px;
+  color: #999;
+}
+
+/* === Toolbar === */
+#toolbar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  background: #f9f9f9;
+  padding: 6px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  overflow-x: auto;
+}
+
+#toolbar button,
+#toolbar select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s, box-shadow 0.2s;
+  font-size: 14px;
+}
+
+#toolbar button:hover,
+#toolbar select:hover {
+  background: #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+#toolbar button:active {
+  background: #d0d0d0;
+}
+
+/* === Picker Panels (Color / Emoji) === */
+.picker-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 1100;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.picker-panel.show {
+  display: block;
+  opacity: 1;
+}
+
+.picker-panel.hide {
+  opacity: 0;
+}
+
+/* === Emoji Grid === */
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  gap: 5px;
+}
+
+.emoji-grid button {
+  padding: 4px;
+  font-size: 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.emoji-grid button:hover {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.emoji-grid button:focus {
+  outline: 2px solid #007BFF;
+  outline-offset: 2px;
+}
+
+/* === Editor Area === */
+#editor {
+  width: 100%;
+  min-height: 200px;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+
+#editor:focus {
+  border-color: #007BFF;
+  outline: none;
+}
+
+@media (min-width: 768px) {
+  #editor {
+    min-height: 300px;
+  }
+}
+
+/* === Feature Image Card === */
+.card-box input[type="file"] {
+  cursor: pointer;
+}
+
+/* === Form Actions === */
+.btn-custom {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: #fff;
+}
+.btn-custom:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+/* === Figures (Images/Videos) === */
+figure {
+  display: inline-block;
+  margin: 10px 0;
+  position: relative;
+}
+
+figure img,
+figure video {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: both;
+  overflow: hidden;
+}
+
+figure figcaption {
+  text-align: center;
+  font-size: 13px;
+  color: #555;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* === Table Styling === */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0;
+}
+
+table, th, td {
+  border: 1px solid #999;
+  padding: 6px;
+}
+
+th {
+  background: #f1f1f1;
+  text-align: left;
+}
+
+/* === Blockquote === */
+blockquote {
+  border-left: 4px solid #ccc;
+  margin: 10px 0;
+  padding: 10px 15px;
+  color: #666;
+  background: #fafafa;
+  font-style: italic;
+  border-radius: 4px;
+}
+
+/* === Preformatted Code === */
+pre {
+  background: #f4f4f4;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+  font-family: Consolas, monospace;
+  font-size: 14px;
+}
+
+/* === Stats (Word/Char Count) === */
+#stats {
+  font-size: 13px;
+  color: #666;
+  margin-top: 8px;
+}
+#stats span {
+  margin-right: 15px;
+}
+
+/* === Utility helpers === */
+.hidden {
+  display: none !important;
+}
+ #animated-text {
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 13px;
+    color: red;
+  }
+
+   .hero-section.overlay {
+      position: relative;
+      background-size: cover;
+      background-position: center center;
+      color: white;
+    }
+    .hero-section.overlay::before {
+      content: "";
+      position: absolute;
+      top:0; left:0; right:0; bottom:0;
+      background: rgba(0, 0, 0, 0.5); /* dark overlay */
+      z-index: 0;
+    }
+    .hero-section > .container,
+    .hero-section > .container .row > div {
+      position: relative;
+      z-index: 1; /* above overlay */
+    }
+    .hero-section h1 {
+    color: #fff !important; /* yellow */
+  }
+/* === Ensure pickers aren’t clipped === */
+.card-box {
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+}
+
+/* === Picker Panels === */
+.picker-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 2000;     /* bump above everything */
+  display: none;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+.picker-panel.show {
+  display: block;
+  opacity: 1;
+}
+.picker-panel.hide {
+  opacity: 0;
+}
+
+/* === (rest of your existing editor CSS…) === */

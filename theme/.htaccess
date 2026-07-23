@@ -1,0 +1,15 @@
+RewriteEngine On
+RewriteBase /
+
+# 1) If someone GETs a URL ending in .php directly, redirect to the clean
+#    (extensionless) version so browsers/search engines only ever see clean URLs.
+#    Restricted to GET only — redirecting POST/PUT/etc. would drop the request body.
+RewriteCond %{THE_REQUEST} ^GET\ /([^?]+)\.php[?\ ] [NC]
+RewriteRule ^ /%1 [R=301,L]
+
+# 2) Internally serve the matching .php file for a clean URL, without changing
+#    what's shown in the address bar. Real files/directories are left alone.
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [L,QSA]

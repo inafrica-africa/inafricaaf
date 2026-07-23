@@ -1,0 +1,75 @@
+/* INAfrica admin theme brand overrides — green / yellow / sky-blue */
+:root {
+  --brand-green: #2fb44b;
+  --brand-yellow: #ede32b;
+  --brand-blue: #29abe2;
+}
+
+#wrapper .topbar {
+  background: linear-gradient(90deg, var(--brand-green) 0%, var(--brand-blue) 100%);
+}
+
+#wrapper .topbar .navbar-nav > li > b {
+  color: #fff;
+}
+
+.left.side-menu {
+  background: #1a1a37;
+}
+
+#sidebar-menu .menu-title {
+  color: var(--brand-yellow);
+}
+
+#sidebar-menu ul li a {
+  color: #d6d6e0;
+}
+
+#sidebar-menu ul li a:hover,
+#sidebar-menu ul li.active > a {
+  color: #fff;
+  background: rgba(41, 171, 226, 0.15);
+  border-left: 3px solid var(--brand-blue);
+}
+
+#sidebar-menu ul ul li a:hover {
+  color: var(--brand-yellow);
+}
+
+.btn-primary {
+  background-color: var(--brand-green);
+  border-color: var(--brand-green);
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--brand-blue) !important;
+  border-color: var(--brand-blue) !important;
+}
+
+.btn-warning {
+  background-color: var(--brand-yellow);
+  border-color: var(--brand-yellow);
+  color: #1a1a37;
+}
+
+.btn-info {
+  background-color: var(--brand-blue);
+  border-color: var(--brand-blue);
+}
+
+a {
+  color: var(--brand-blue);
+}
+a:hover {
+  color: var(--brand-green);
+}
+
+.widget-box,
+.card-box {
+  border-top: 3px solid var(--brand-blue);
+}
+
+.stat-card-green { border-top: 3px solid var(--brand-green) !important; }
+.stat-card-yellow { border-top: 3px solid var(--brand-yellow) !important; }
+.stat-card-blue { border-top: 3px solid var(--brand-blue) !important; }

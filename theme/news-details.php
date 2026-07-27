@@ -353,16 +353,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </li>
                     </ul>
 
-                    <?php if (!empty($postImage)): ?>
+                    <?php
+                    // Same fallback used everywhere else a post's cover shows up
+                    // (homepage Recent Updates/blog cards, this page's own Recent
+                    // Posts and Related Articles below) so whatever image a reader
+                    // already saw in a preview is the one they see here too.
+                    $mainPostImageSrc = !empty($postImage) ? 'admin/postimages/' . htmlspecialchars($postImage) : 'images/blog/post-1.jpg';
+                    ?>
                     <div class="post-image mb-4">
-                        <img src="admin/postimages/<?= htmlspecialchars($postImage) ?>" alt="<?= htmlspecialchars($postTitle) ?>" class="img-fluid rounded">
+                        <img src="<?= $mainPostImageSrc ?>" alt="<?= htmlspecialchars($postTitle) ?>" class="img-fluid rounded">
                     </div>
-                    <?php else: ?>
-                    <div class="post-image-placeholder mb-4 text-center">
-                        <i class="ti-image"></i>
-                        <p class="mb-0">No featured image for this article</p>
-                    </div>
-                    <?php endif; ?>
                     
                     <div class="content">
                         <?= $postDetails ?>

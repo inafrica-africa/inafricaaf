@@ -549,17 +549,30 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
 }
 
 /* On mobile the follow-us icons (Facebook/X/GitHub/Instagram) and the
-   Donate/Staff text links ran together in one indistinct, cramped strip.
-   Bigger icons give a real tap target, and a divider before Donate/Staff
-   separates "follow us" from "site actions" as two distinct groups. */
+   Donate/Staff text links ran together in one indistinct, cramped strip —
+   same-size text glyphs with no visual boundary between "follow us" and
+   "site actions". Give the icons an actual circular button treatment
+   (matching the sidebar Follow Us widget) and keep Donate/Staff as a
+   clearly separated, bordered-off group of small pill links. */
 @media (max-width: 767px) {
-  header .top-header .top-header-icons a {
-    font-size: 19px;
-    padding: 6px 8px;
-    margin-right: 2px;
+  header .top-header .top-header-icons .list-inline-item {
+    margin-right: 6px;
+  }
+  header .top-header .top-header-icons .list-inline-item:not(:nth-last-child(-n+2)) a {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin-right: 0;
+    border-radius: 50%;
+    background: rgba(47, 180, 75, 0.1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    vertical-align: middle;
   }
   header .top-header .top-header-icons .list-inline-item:nth-last-child(2) {
-    margin-left: 8px;
+    margin-left: 4px;
     padding-left: 10px;
     border-left: 1px solid rgba(0, 0, 0, 0.15);
   }
@@ -567,6 +580,8 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   header .top-header .top-header-icons .list-inline-item:last-child a {
     font-size: 13px;
     font-weight: 600;
+    padding: 4px 8px;
+    margin-right: 0;
   }
 }
 
@@ -999,11 +1014,25 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   border-radius: 60%;
 }
 
-/* Footer contact */
+/* Footer contact: icon + text were plain inline content, so once the text
+   (especially the two full email addresses) wrapped past one line, the
+   wrapped line started back at the li's left edge — directly under the
+   icon — instead of staying clear of it. Flex row keeps the icon a
+   fixed-width column on the left and the text in its own column to the
+   right, so however many lines it wraps to, none of them collide. */
 .footer-contact li {
+  display: flex;
+  align-items: flex-start;
+  text-align: left;
+  gap: 6px;
   font-size: 14px;
   color: rgba(255,255,255,0.85);
   line-height: 1.5;
+}
+.footer-contact li i {
+  flex-shrink: 0;
+  margin-top: 3px;
+  margin-right: 0;
 }
 .footer-contact a {
   color: rgba(255,255,255,0.85);
@@ -1377,10 +1406,24 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   font-size: 13px;
   border-radius: 20px;
 }
+/* news-details.php sidebar "Follow Us" widget: was 3 bare Bootstrap outline
+   buttons (rectangular, since .btn is border-radius:0 site-wide) sized to
+   whatever their icon glyph happened to need — no consistent shape or
+   size, which read as unstyled rather than a real social-icon row. */
 .social-icons {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
+}
+.social-icons .btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
 }
 
 /* events.php: Finished/Upcoming columns sit side-by-side with a divider on

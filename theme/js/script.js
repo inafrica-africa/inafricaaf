@@ -27,6 +27,10 @@
 	// Measures the real, current height of the fixed header and applies it as
 	// padding-top on any element that needs to clear it, instead of a guessed
 	// pixel value that breaks every time the header's own content changes.
+	// Covers every section that sits directly under the fixed header
+	// (below-fixed-header on news-details.php, page-title-section on
+	// about/contact/documents/donate/events/gallery/region.php, hero-section
+	// on the homepage) so none of them can end up hidden underneath it.
 	function syncFixedHeaderOffset() {
 		var $header = $('header.fixed-top');
 		if (!$header.length) { return; }
@@ -34,18 +38,26 @@
 		if (wasHidden) { $('.top-header').removeClass('hide'); }
 		var headerHeight = $header.outerHeight();
 		if (wasHidden) { $('.top-header').addClass('hide'); }
-		$('.below-fixed-header').css('padding-top', headerHeight + 'px');
+		// +8px safety buffer: on slower connections the webfont/ad images can
+		// finish loading (and reflow the header a little taller) after this
+		// first measurement runs.
+		$('.below-fixed-header, .page-title-section, .hero-section').css('padding-top', (headerHeight + 8) + 'px');
 	}
-	$(window).on('load resize', syncFixedHeaderOffset);
+	$(window).on('load resize orientationchange', syncFixedHeaderOffset);
 	syncFixedHeaderOffset();
-	// navbarDropdown
-	if ($(window).width() < 992) {
-		$('.navigation .dropdown-toggle').on('click', function () {
-			$(this).siblings('.dropdown-menu').animate({
-				height: 'toggle'
-			}, 300);
-		});
+	// Re-measure a bit later too, in case a slow webfont or ad image swap
+	// changed the header's real height after the initial 'load'-time pass.
+	setTimeout(syncFixedHeaderOffset, 600);
+	setTimeout(syncFixedHeaderOffset, 1800);
+	if (document.fonts && document.fonts.ready) {
+		document.fonts.ready.then(syncFixedHeaderOffset);
 	}
+	// Region/Category dropdowns on mobile already open/close correctly via
+	// Bootstrap's own dropdown-toggle handler (data-toggle="dropdown" in
+	// header.php). A second jQuery height-toggle animation bound to the same
+	// click used to fight that handler for control of the menu's
+	// show/hide state, leaving a stale inline height from the last animation
+	// that could clip the menu open on the next tap.
 
 	// Background-images
 	$('[data-background]').each(function () {
@@ -54,24 +66,28 @@
 		});
 	});
 
-	//Hero Slider
-	$('.hero-slider').slick({
-		autoplay: true,
-		autoplaySpeed: 7500,
-		pauseOnFocus: false,
-		pauseOnHover: false,
-		infinite: true,
-		arrows: true,
-		fade: true,
-		prevArrow: '<button type=\'button\' class=\'prevArrow\'><i class=\'ti-angle-left\'></i></button>',
-		nextArrow: '<button type=\'button\' class=\'nextArrow\'><i class=\'ti-angle-right\'></i></button>',
-		dots: true
-	});
-	$('.hero-slider').slickAnimation();
+	//Hero Slider (guarded: news-details.php/subcategory.php load this script
+	// without slick.min.js since they have no hero-slider on the page, and
+	// calling a plugin method that was never registered throws)
+	if (typeof $.fn.slick === 'function' && $('.hero-slider').length) {
+		$('.hero-slider').slick({
+			autoplay: true,
+			autoplaySpeed: 7500,
+			pauseOnFocus: false,
+			pauseOnHover: false,
+			infinite: true,
+			arrows: false, // autoplay + swipe already move the slide; arrows aren't needed
+			fade: true,
+			dots: true
+		});
+		$('.hero-slider').slickAnimation();
+	}
 
 	// venobox popup
 	$(document).ready(function () {
-		$('.venobox').venobox();
+		if (typeof $.fn.venobox === 'function') {
+			$('.venobox').venobox();
+		}
 	});
 
 
@@ -122,15 +138,18 @@
 
 })(jQuery);
 
-  document.querySelector('a[href="#top-header"]').addEventListener('click', function(e) {
-    e.preventDefault();
-    const target = document.querySelector('#top-header');
-    const offset = 100; // adjust this number based on your navbar height
-    const position = target.offsetTop - offset;
+  const topHeaderLink = document.querySelector('a[href="#top-header"]');
+  if (topHeaderLink) {
+    topHeaderLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector('#top-header');
+      const offset = 100; // adjust this number based on your navbar height
+      const position = target.offsetTop - offset;
 
-    window.scrollTo({
-      top: position,
-      behavior: 'smooth'
+      window.scrollTo({
+        top: position,
+        behavior: 'smooth'
+      });
     });
-  });
+  }
 

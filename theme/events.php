@@ -105,5 +105,6 @@ function renderEventCard($event) {
   <?php include('footer.php'); ?>
   <script src="plugins/jQuery/jquery.min.js"></script>
   <script src="plugins/bootstrap/bootstrap.min.js"></script>
+  <script src="js/script.js?v=<?= @filemtime(__DIR__ . '/js/script.js') ?>"></script>
 </body>
 </html>

@@ -269,7 +269,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="advert-container below-fixed-header d-flex justify-content-between align-items-center py-2">
     <div class="advert-container-left">
       <?php if (!empty($adverts['landscape'][0])): ?>
-        <?php renderAdvertCard($adverts['landscape'][0], 'width:350px; height:auto; max-height:100px;'); ?>
+        <?php renderAdvertCard($adverts['landscape'][0], 'width:100%; max-width:350px; height:auto; max-height:100px;'); ?>
       <?php endif; ?>
     </div>
 
@@ -281,7 +281,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="advert-container-right">
       <?php if (!empty($adverts['landscape'][1])): ?>
-        <?php renderAdvertCard($adverts['landscape'][1], 'width:350px; height:auto; max-height:100px;'); ?>
+        <?php renderAdvertCard($adverts['landscape'][1], 'width:100%; max-width:350px; height:auto; max-height:100px;'); ?>
       <?php endif; ?>
     </div>
   </div>

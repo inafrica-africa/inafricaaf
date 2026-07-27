@@ -438,6 +438,21 @@ a h4:hover {
 .page-title-section.overlay::before {
   background: rgba(0, 0, 0, 0.25);
 }
+/* Same fixed-header height problem .below-fixed-header already accounts for
+   (top-header stacks to 3 rows + subnav below 992px) applies here too: about,
+   contact, documents, donate, events, gallery and region.php all use this
+   class, and without the same bump their page title renders underneath the
+   fixed header on mobile instead of below it. */
+@media (max-width: 991px) {
+  .page-title-section {
+    padding-top: 280px;
+  }
+}
+@media (max-width: 575px) {
+  .page-title-section {
+    padding-top: 320px;
+  }
+}
 
 .custom-breadcrumb li.nasted {
   position: relative;
@@ -615,6 +630,28 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
+/* Bootstrap's navbar-dark toggler icon is semi-transparent white
+   (rgba(255,255,255,.5)), which nearly disappears against the bright
+   yellow nav background. Swap in a dark-green icon plus a proper button
+   chrome so it reads clearly and looks like a deliberate tap target
+   instead of a stray outline. */
+.navbar-toggler {
+  border: 1px solid rgba(47, 180, 75, 0.35);
+  border-radius: 6px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.35);
+}
+.navbar-toggler:hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+.navbar-toggler:focus {
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(47, 180, 75, 0.25);
+}
+.navbar-dark .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(47, 180, 75, 0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
 .navbar-brand {
   display: flex;
   align-items: center;
@@ -627,6 +664,33 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   max-height: 90px;
   margin-right: 8px;
   border-radius: 6px;
+}
+
+/* On narrow phones (e.g. Galaxy A06, ~360-412px wide) the full-height logo
+   plus the fully-typed animated brand text ("INAfrica-Iyi Ni Africa.") are
+   wider than the viewport, wrapping the navbar-toggler onto its own line
+   instead of keeping it docked top-right. Shrink both so brand + toggler
+   always fit on one line, and drop the decorative tagline on the narrowest
+   screens where there simply isn't room for it. */
+@media (max-width: 767px) {
+  .navbar-brand {
+    min-width: 0;
+  }
+  .navbar-brand img {
+    max-height: 50px;
+    margin-right: 6px;
+  }
+  #brandText {
+    font-size: 13px;
+  }
+  .navbar-toggler {
+    flex-shrink: 0;
+  }
+}
+@media (max-width: 400px) {
+  #brandText {
+    display: none;
+  }
 }
 
 /* Navbar items */
@@ -740,6 +804,23 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
     text-align: left;
     gap: 0.75rem;
   }
+
+  /* Region/Category dropdowns default to Bootstrap's position:absolute
+     (via Popper), which overlays the menu on top of the rest of the
+     collapsed mobile nav instead of pushing it down. Forcing static/in-flow
+     positioning makes tapping "Region" expand an accordion-style list
+     instead of covering the Contact/other links underneath it. The
+     !important is needed to beat Popper's own inline positioning styles. */
+  #mainNav .dropdown-menu {
+    position: static !important;
+    float: none;
+    width: 100%;
+    box-shadow: none;
+    border: none;
+    background: rgba(0, 0, 0, 0.03);
+    margin: 0;
+    padding-left: 1rem;
+  }
 }
 
 /* Animated header text */
@@ -804,9 +885,52 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   padding: 22px 0;
 }
 .footer h6 {
+  display: inline-block; /* so the accent underline below only spans the text
+                             and follows whichever text-align the column
+                             already uses (left/center/right) instead of
+                             needing separate rules per breakpoint */
   font-weight: 600;
-  margin-bottom: 8px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding-bottom: 10px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.4);
 }
+
+/* Keep the three footer columns side by side at every width instead of
+   Bootstrap's default of stacking them full-width on mobile — the footer
+   should always read as one horizontal row, just a narrower one on phones,
+   with a divider between columns instead of a wall of centered text. */
+@media (max-width: 991px) {
+  .footer .row {
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+  .footer .row > [class*="col-"] {
+    flex: 1 1 0;
+    max-width: 33.333%;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .footer .row > [class*="col-"]:not(:last-child) {
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .footer h6 {
+    font-size: 11px;
+    letter-spacing: 0.3px;
+  }
+  .footer a,
+  .footer-contact li {
+    font-size: 11px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  .footer-logo {
+    max-height: 36px;
+  }
+}
+
 .footer a {
   display: inline-block;
   font-size: 14px;
@@ -821,6 +945,9 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   color: #ffbc3b;
   text-decoration: underline;
   font-weight: 500;
+}
+.footer ul.list-unstyled li {
+  margin-bottom: 6px;
 }
 
 /* Footer Logo */
@@ -970,44 +1097,11 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   }
 }
 
-/* Arrows for hero slider */
-.hero-slider .prevArrow,
-.hero-slider .nextArrow {
-  position: absolute;
-  bottom: -123px;
-  z-index: 9;
-  padding: 15px;
-  color: rgba(255, 255, 255, 0.5);
-  border: 0;
-  font-size: 30px;
-}
-
-.hero-slider .prevArrow:focus,
-.hero-slider .nextArrow:focus {
-  outline: 0;
-}
-
-.hero-slider .prevArrow:hover,
-.hero-slider .nextArrow:hover {
-  color: #ede32b;
-}
-
-.hero-slider .prevArrow {
-  right: 60px;
-}
-
-.hero-slider .nextArrow {
-  right: 0;
-}
-
-/* On mobile, let touch swipe (already enabled by Slick's default swipe:true)
-   drive the slider instead of the arrow buttons cluttering the layout. */
-@media (max-width: 767px) {
-  .hero-slider .prevArrow,
-  .hero-slider .nextArrow {
-    display: none;
-  }
-}
+/* Prev/next arrows removed entirely (arrows:false in js/script.js's Slick
+   init) — the slider autoplays and swipes on its own, and the arrows were
+   absolutely positioned 123px below the slider's own bottom edge, spilling
+   down into whatever section follows it (the sponsored-ad row) instead of
+   staying contained. Dots (below) are the only nav control now. */
 
 /* Dots for hero slider */
 .hero-slider .slick-dots {
@@ -1239,13 +1333,105 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   justify-content: center;
   gap: 10px;
 }
+/* .btn's site-wide default (15px 40px padding, square corners) is sized for
+   a standalone call-to-action, not 3 buttons side by side — at that size
+   they can't fit a phone-width row and each wraps onto its own full-width
+   line instead of reading as one compact share bar. */
 .social-share-buttons .btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: 20px;
 }
 .social-icons {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+/* events.php: Finished/Upcoming columns sit side-by-side with a divider on
+   desktop; below 768px they stack full-width and the divider is left
+   dangling as a stray vertical line down the middle of the page. */
+@media (max-width: 767px) {
+  .col-md-6.border-right {
+    border-right: 0 !important;
+    border-bottom: 1px solid #ededf1;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+  }
+}
+
+/* news-details.php: two fixed-width (350px) sponsored ad slots flank a
+   date/time block with no wrap, so on any phone-width viewport they force
+   the row far wider than the screen (body's overflow-x:hidden then just
+   clips the overflow instead of showing it, so the ads render half-cut).
+   Wrapping + letting the (now responsive-width) ad images shrink fixes it. */
+@media (max-width: 767px) {
+  .advert-container {
+    flex-wrap: wrap;
+    justify-content: center !important;
+    gap: 12px;
+  }
+  .advert-container-left,
+  .advert-container-middle,
+  .advert-container-right {
+    flex: 0 1 100%;
+    max-width: 100%;
+    text-align: center;
+  }
+}
+
+/* ---------------- news-details.php: single-post page ----------------
+   The sidebar widgets, comments and post meta had no styling of their own
+   at all — just raw Bootstrap defaults (unstyled h5s, bare <li>s, no
+   spacing) — which is what made the article page look unfinished. */
+.post-title {
+  font-size: 28px;
+  margin-bottom: 14px;
+}
+@media (max-width: 575px) {
+  .post-title {
+    font-size: 22px;
+  }
+}
+.post-meta {
+  color: #8585a4;
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+.post-meta .list-inline-item:not(:last-child) {
+  margin-right: 18px;
+}
+
+.sidebar .widget,
+.advert-rail .widget {
+  background: #fff;
+  border: 1px solid #ededf1;
+  border-radius: 8px;
+  padding: 18px;
+  box-shadow: 0 2px 10px rgba(27, 39, 71, 0.05);
+}
+.widget-title {
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: 10px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #ede32b;
+}
+
+.comment-form-container,
+.comment-item {
+  background: #f8f9fa;
+  border: 1px solid #ededf1;
+  border-radius: 8px;
+  padding: 20px;
+}
+.comment-item + .comment-item {
+  margin-top: 16px;
+}
+.reply-form-container .form-control {
+  background: #fff;
 }

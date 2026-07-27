@@ -548,6 +548,28 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   margin-right: 0;
 }
 
+/* On mobile the follow-us icons (Facebook/X/GitHub/Instagram) and the
+   Donate/Staff text links ran together in one indistinct, cramped strip.
+   Bigger icons give a real tap target, and a divider before Donate/Staff
+   separates "follow us" from "site actions" as two distinct groups. */
+@media (max-width: 767px) {
+  header .top-header .top-header-icons a {
+    font-size: 19px;
+    padding: 6px 8px;
+    margin-right: 2px;
+  }
+  header .top-header .top-header-icons .list-inline-item:nth-last-child(2) {
+    margin-left: 8px;
+    padding-left: 10px;
+    border-left: 1px solid rgba(0, 0, 0, 0.15);
+  }
+  header .top-header .top-header-icons .list-inline-item:nth-last-child(2) a,
+  header .top-header .top-header-icons .list-inline-item:last-child a {
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+
 /* Clears the fixed header for pages whose first section isn't already
    offset by .hero-section / .page-title-section padding. */
 .below-fixed-header {
@@ -907,11 +929,18 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
     flex-wrap: nowrap;
     align-items: stretch;
   }
+  /* The contact column carries the most content (logo + phone + 2 emails),
+     so give it more of the row than the two short link lists instead of
+     splitting evenly — an even 33/33/33 split was what forced the emails
+     to wrap so awkwardly. */
   .footer .row > [class*="col-"] {
     flex: 1 1 0;
-    max-width: 33.333%;
-    padding-left: 8px;
-    padding-right: 8px;
+    max-width: 28%;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+  .footer .row > [class*="col-"]:last-child {
+    max-width: 44%;
   }
   .footer .row > [class*="col-"]:not(:last-child) {
     border-right: 1px solid rgba(255, 255, 255, 0.15);
@@ -924,7 +953,10 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   .footer-contact li {
     font-size: 11px;
     line-height: 1.5;
-    word-break: break-word;
+    /* Only break at the <wbr> we added after "@" in the email addresses
+       (footer.php) — letting the browser cut anywhere mid-word is what
+       chopped "inafricaac.org" into "inafricaa" / "c.org" before. */
+    overflow-wrap: normal;
   }
   .footer-logo {
     max-height: 36px;

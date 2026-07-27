@@ -46,8 +46,8 @@
           <ul class="list-unstyled small footer-contact">
             <li class="mb-1"><i class="ti-location-pin mr-2"></i> Kigali, Rwanda</li>
             <li class="mb-1"><i class="ti-mobile mr-2"></i> <a href="tel:+250793903919">+250 793 903 919</a></li>
-            <li class="mb-1"><i class="ti-email mr-2"></i> <a href="mailto:info@inafricaac.org">info@inafricaac.org</a></li>
-            <li class="mb-1"><i class="ti-email mr-2"></i> <a href="mailto:contact@inafricaac.org">contact@inafricaac.org</a></li>
+            <li class="mb-1"><i class="ti-email mr-2"></i> <a href="mailto:info@inafricaac.org">info@<wbr>inafricaac.org</a></li>
+            <li class="mb-1"><i class="ti-email mr-2"></i> <a href="mailto:contact@inafricaac.org">contact@<wbr>inafricaac.org</a></li>
           </ul>
         </div>
 

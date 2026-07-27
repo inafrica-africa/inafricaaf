@@ -266,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <!-- Advert Container -->
   <?php $adverts = fetchAdverts($con); ?>
-  <div class="advert-container below-fixed-header d-flex justify-content-between align-items-center py-2">
+  <div class="advert-container below-fixed-header d-flex justify-content-between align-items-center pb-2">
     <div class="advert-container-left">
       <?php if (!empty($adverts['landscape'][0])): ?>
         <?php renderAdvertCard($adverts['landscape'][0], 'width:100%; max-width:350px; height:auto; max-height:100px;'); ?>

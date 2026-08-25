@@ -83,32 +83,40 @@ $pageno = isset($_GET['pageno']) ? intval($_GET['pageno']) : 1;
 $no_of_records_per_page = 8;
 $offset = ($pageno - 1) * $no_of_records_per_page;
 
-// Count total posts in the subcategory
-$total_pages_sql = "SELECT COUNT(*) FROM tblposts WHERE Is_Active='1' AND SubCategoryId='" . $_SESSION['subcatid'] . "'";
-$result = mysqli_query($con, $total_pages_sql);
-$total_rows = mysqli_fetch_array($result)[0];
-$total_pages = ceil($total_rows / $no_of_records_per_page);
+if (empty($_SESSION['subcatid'])) {
+    // No subcategory chosen yet (fresh visit, no ?subcatid= and nothing in
+    // session) - skip the query instead of running it with a blank id,
+    // which previously threw "Undefined array key" warnings straight into
+    // the page (display_errors is on in config.php).
+    $rowcount = 0;
+} else {
+    // Count total posts in the subcategory
+    $total_pages_sql = "SELECT COUNT(*) FROM tblposts WHERE Is_Active='1' AND SubCategoryId='" . $_SESSION['subcatid'] . "'";
+    $result = mysqli_query($con, $total_pages_sql);
+    $total_rows = mysqli_fetch_array($result)[0];
+    $total_pages = ceil($total_rows / $no_of_records_per_page);
 
-// Fetch posts for subcategory
-$query = mysqli_query($con, "
-    SELECT 
-        tblposts.PostUrl,
-        tblposts.PostTitle as posttitle,
-        tblposts.PostImage,
-        tblcategory.CategoryName as category,
-        tblsubcategory.Subcategory as subcategory,
-        tblposts.PostDetails as postdetails,
-        tblposts.PostingDate as postingdate
-    FROM tblposts 
-    LEFT JOIN tblcategory ON tblcategory.id = tblposts.CategoryId 
-    LEFT JOIN tblsubcategory ON tblsubcategory.SubCategoryId = tblposts.SubCategoryId 
-    WHERE tblposts.SubCategoryId='" . $_SESSION['subcatid'] . "' 
-      AND tblposts.Status='Approved' 
-    ORDER BY tblposts.id DESC 
-    LIMIT $offset, $no_of_records_per_page
-");
+    // Fetch posts for subcategory
+    $query = mysqli_query($con, "
+        SELECT
+            tblposts.PostUrl,
+            tblposts.PostTitle as posttitle,
+            tblposts.PostImage,
+            tblcategory.CategoryName as category,
+            tblsubcategory.Subcategory as subcategory,
+            tblposts.PostDetails as postdetails,
+            tblposts.PostingDate as postingdate
+        FROM tblposts
+        LEFT JOIN tblcategory ON tblcategory.id = tblposts.CategoryId
+        LEFT JOIN tblsubcategory ON tblsubcategory.SubCategoryId = tblposts.SubCategoryId
+        WHERE tblposts.SubCategoryId='" . $_SESSION['subcatid'] . "'
+          AND tblposts.Status='Approved'
+        ORDER BY tblposts.id DESC
+        LIMIT $offset, $no_of_records_per_page
+    ");
 
-$rowcount = mysqli_num_rows($query);
+    $rowcount = mysqli_num_rows($query);
+}
 
 if ($rowcount == 0) {
     echo "<p>No records found under <strong>" . htmlentities($subcatName) . "</strong>.</p>";

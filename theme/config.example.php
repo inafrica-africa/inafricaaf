@@ -18,6 +18,48 @@ if (mysqli_connect_errno()) {
     exit();
 }
 
+if (!defined('SITE_URL')) {
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+    define('SITE_URL', $scheme . ($_SERVER['HTTP_HOST'] ?? 'inafricaac.org'));
+}
+
+if (!function_exists('renderMetaTags')) {
+    // Open Graph / Twitter Card tags, shared by every page, so that pasting any
+    // page's link into Facebook, WhatsApp, X, Slack, etc. shows the right title,
+    // description and image. $url and $image must be absolute — link-preview
+    // scrapers ignore relative URLs — so both are resolved against SITE_URL here
+    // rather than left to each page to get right (or wrong) on its own.
+    function renderMetaTags($title, $description, $image, $path, $type = 'website') {
+        $url = SITE_URL . $path;
+        $absImage = preg_match('#^https?://#i', $image) ? $image : SITE_URL . '/' . ltrim($image, '/');
+
+        $title = htmlspecialchars($title);
+        $description = htmlspecialchars($description);
+        $url = htmlspecialchars($url);
+        $absImage = htmlspecialchars($absImage);
+        $type = htmlspecialchars($type);
+        ?>
+<link rel="canonical" href="<?= $url ?>">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="<?= $type ?>">
+<meta property="og:url" content="<?= $url ?>">
+<meta property="og:title" content="<?= $title ?>">
+<meta property="og:description" content="<?= $description ?>">
+<meta property="og:image" content="<?= $absImage ?>">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="<?= $url ?>">
+<meta name="twitter:title" content="<?= $title ?>">
+<meta name="twitter:description" content="<?= $description ?>">
+<meta name="twitter:image" content="<?= $absImage ?>">
+        <?php
+    }
+}
+
 if (!function_exists('getMimeType')) {
     function getMimeType($base64Data) {
         $binary = base64_decode($base64Data, true);

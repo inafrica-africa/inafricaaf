@@ -12,6 +12,12 @@ include('config.php');
   <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
   <link href="css/style.css?v=<?= @filemtime(__DIR__ . '/css/style.css') ?>" rel="stylesheet">
   <link rel="shortcut icon" href="images/logo.png" type="image/x-icon">
+  <?php renderMetaTags(
+    'About Us | INAfrica',
+    'INAfrica: A Pan-African, youth-led framework for sustainable development and continental transformation.',
+    'images/logo.png',
+    '/about'
+  ); ?>
 </head>
 <body class="about-page">
   <?php include('header.php'); ?>
@@ -258,8 +264,8 @@ include('config.php');
           <p class="font-weight-bold">Change the space within your reach. Together, we transform Africa.</p>
 
           <div class="mt-4">
-            <a href="contact.php" class="btn btn-primary mr-2">Contact Us</a>
-            <a href="donate.php" class="btn btn-outline-primary">Support Our Work</a>
+            <a href="contact" class="btn btn-primary mr-2">Contact Us</a>
+            <a href="donate" class="btn btn-outline-primary">Support Our Work</a>
           </div>
         </div>
       </div>

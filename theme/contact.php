@@ -49,6 +49,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
   <link href="css/style.css?v=<?= @filemtime(__DIR__ . '/css/style.css') ?>" rel="stylesheet">
   <link rel="shortcut icon" href="images/logo.png" type="image/x-icon">
+  <?php renderMetaTags(
+    'Contact Us | INAfrica',
+    'INAfrica Youth Initiative: Connecting more than 1.54 Billion African Citizens.',
+    'images/logo.png',
+    '/contact'
+  ); ?>
 </head>
 <body>
   <?php include('header.php'); ?>
@@ -79,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <?php if ($success): ?>
             <div class="alert alert-success"><?= $success ?></div>
           <?php endif; ?>
-          <form method="post" action="contact.php">
+          <form method="post" action="contact">
             <input type="hidden" name="csrftoken" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
             <div class="form-row">
               <div class="form-group col-md-6">

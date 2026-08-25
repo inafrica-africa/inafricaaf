@@ -19,6 +19,12 @@ if ($result) {
   <link rel="stylesheet" href="plugins/venobox/venobox.css">
   <link href="css/style.css?v=<?= @filemtime(__DIR__ . '/css/style.css') ?>" rel="stylesheet">
   <link rel="shortcut icon" href="images/logo.png" type="image/x-icon">
+  <?php renderMetaTags(
+    'Gallery | INAfrica',
+    'INAfrica Youth Initiative: Connecting more than 1.54 Billion African Citizens.',
+    'images/logo.png',
+    '/gallery'
+  ); ?>
 </head>
 <body>
   <?php include('header.php'); ?>

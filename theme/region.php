@@ -80,6 +80,12 @@ if ($activeRegion) {
   <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
   <link href="css/style.css?v=<?= @filemtime(__DIR__ . '/css/style.css') ?>" rel="stylesheet">
   <link rel="shortcut icon" href="images/logo.png" type="image/x-icon">
+  <?php renderMetaTags(
+    ($activeRegion ? $activeRegion['RegionName'] : 'Africa Regions') . ' | INAfrica',
+    'INAfrica Youth Initiative: Connecting more than 1.54 Billion African Citizens.',
+    'images/logo.png',
+    '/region' . ($_SERVER['QUERY_STRING'] ? '?' . $_SERVER['QUERY_STRING'] : '')
+  ); ?>
 </head>
 <body>
   <?php include('header.php'); ?>
@@ -98,7 +104,7 @@ if ($activeRegion) {
           <ul class="list-inline">
             <?php foreach ($regions as $region): ?>
               <li class="list-inline-item mx-2 mb-2">
-                <a href="region.php?region=<?= (int) $region['id'] ?>" class="btn btn-sm <?= $activeRegion && $activeRegion['id'] == $region['id'] ? 'btn-primary' : 'btn-outline-primary' ?>"><?= htmlspecialchars($region['RegionName']) ?></a>
+                <a href="region?region=<?= (int) $region['id'] ?>" class="btn btn-sm <?= $activeRegion && $activeRegion['id'] == $region['id'] ? 'btn-primary' : 'btn-outline-primary' ?>"><?= htmlspecialchars($region['RegionName']) ?></a>
               </li>
             <?php endforeach; ?>
           </ul>
@@ -130,7 +136,7 @@ if ($activeRegion) {
         <div class="row">
           <?php foreach ($countries as $country): ?>
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-              <a href="region.php?region=<?= $regionId ?>&country=<?= (int) $country['id'] ?>" class="card h-100 text-decoration-none text-dark country-card">
+              <a href="region?region=<?= $regionId ?>&country=<?= (int) $country['id'] ?>" class="card h-100 text-decoration-none text-dark country-card">
                 <div class="card-body text-center">
                   <?php if ($country['CountryCode']): ?>
                     <img src="https://flagcdn.com/w80/<?= htmlspecialchars($country['CountryCode']) ?>.png" alt="Flag of <?= htmlspecialchars($country['CountryName']) ?>" style="height:40px; box-shadow:0 1px 4px rgba(0,0,0,0.2); border-radius:2px; margin-bottom:10px;">
@@ -153,15 +159,15 @@ if ($activeRegion) {
         <nav class="mb-4">
           <ul class="pagination justify-content-center">
             <li class="page-item <?= $countryPage <= 1 ? 'disabled' : '' ?>">
-              <a class="page-link" href="region.php?region=<?= $regionId ?>&cpage=<?= max(1, $countryPage - 1) ?>">&laquo; Prev</a>
+              <a class="page-link" href="region?region=<?= $regionId ?>&cpage=<?= max(1, $countryPage - 1) ?>">&laquo; Prev</a>
             </li>
             <?php for ($p = 1; $p <= $totalCountryPages; $p++): ?>
               <li class="page-item <?= $p == $countryPage ? 'active' : '' ?>">
-                <a class="page-link" href="region.php?region=<?= $regionId ?>&cpage=<?= $p ?>"><?= $p ?></a>
+                <a class="page-link" href="region?region=<?= $regionId ?>&cpage=<?= $p ?>"><?= $p ?></a>
               </li>
             <?php endfor; ?>
             <li class="page-item <?= $countryPage >= $totalCountryPages ? 'disabled' : '' ?>">
-              <a class="page-link" href="region.php?region=<?= $regionId ?>&cpage=<?= min($totalCountryPages, $countryPage + 1) ?>">Next &raquo;</a>
+              <a class="page-link" href="region?region=<?= $regionId ?>&cpage=<?= min($totalCountryPages, $countryPage + 1) ?>">Next &raquo;</a>
             </li>
           </ul>
         </nav>
@@ -172,7 +178,7 @@ if ($activeRegion) {
         <?php else: ?>
         <div class="row mb-4">
           <div class="col-12 text-center">
-            <a href="region.php?region=<?= $regionId ?>" class="btn btn-xs btn-outline-secondary mb-1">&larr; Back to all <?= htmlspecialchars($activeRegion['RegionName']) ?> countries</a>
+            <a href="region?region=<?= $regionId ?>" class="btn btn-xs btn-outline-secondary mb-1">&larr; Back to all <?= htmlspecialchars($activeRegion['RegionName']) ?> countries</a>
           </div>
         </div>
 
@@ -292,7 +298,7 @@ if ($activeRegion) {
                 <?php endif; ?>
                 <div class="card-body">
                   <p class="mb-1"><small><?= date('F j, Y', strtotime($post['PostingDate'])) ?></small></p>
-                  <a href="news-details.php?PostUrl=<?= urlencode($post['PostUrl']) ?>" class="text-decoration-none text-dark">
+                  <a href="news-details?PostUrl=<?= urlencode($post['PostUrl']) ?>" class="text-decoration-none text-dark">
                     <h5 class="card-title"><?= htmlspecialchars($post['PostTitle']) ?></h5>
                   </a>
                 </div>

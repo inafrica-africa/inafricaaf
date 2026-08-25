@@ -145,7 +145,7 @@ if ($checkResult->num_rows === 0) {
 
 // Step 6: Generate full URL and get post title
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
-$fullPostUrl = $scheme . $_SERVER['HTTP_HOST'] . '/news-details.php?PostUrl=' . urlencode($row['url']);
+$fullPostUrl = $scheme . $_SERVER['HTTP_HOST'] . '/news-details?PostUrl=' . urlencode($row['url']);
 
 $postTitle   = htmlentities($row['posttitle']   ?? '', ENT_QUOTES, 'UTF-8');
 $postImage   = htmlentities($row['PostImage']   ?? '', ENT_QUOTES, 'UTF-8');
@@ -189,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
             
             // Redirect to avoid resubmission - use the original URL parameter for consistency
-            header("Location: news-details.php?PostUrl=" . urlencode($PostUrl));
+            header("Location: news-details?PostUrl=" . urlencode($PostUrl));
             exit();
         } catch (Exception $e) {
             error_log($e->getMessage());
@@ -211,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($stmt->execute()) {
                 $stmt->close();
-                header("Location: news-details.php?PostUrl=" . urlencode($PostUrl));
+                header("Location: news-details?PostUrl=" . urlencode($PostUrl));
                 exit();
             } else {
                 $stmt->close();
@@ -226,7 +226,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php $siteUrl = '/educenter/theme/'; ?>
     <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="INAfrica Youth Initiative: Connecting more than 1.54 Billion African Citizens.">
@@ -240,22 +239,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <link rel="shortcut icon" href="images/logo.png" type="image/x-icon">
 
-<!-- Open Graph / Facebook -->
-<meta property="og:type" content="article">
-<meta property="og:url" content="<?= $fullPostUrl ?>">
-<meta property="og:title" content="<?= htmlspecialchars($row['posttitle']) ?>">
-<meta property="og:description" content="<?= htmlspecialchars(mb_substr(strip_tags($row['postdetails'] ?? ''), 0, 297)) ?>">
-<?php $ogImage = !empty($row['PostImage']) ? $siteUrl . 'admin/postimages/' . htmlspecialchars($row['PostImage']) : $siteUrl . 'images/logo.png'; ?>
-<meta property="og:image" content="<?= $ogImage ?>">
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="<?= $fullPostUrl ?>">
-<meta property="twitter:title" content="<?= htmlspecialchars($row['posttitle']) ?>">
-<meta property="twitter:description" content="<?= htmlspecialchars(mb_substr(strip_tags($row['postdetails'] ?? ''), 0, 297)) ?>">
-<meta property="twitter:image" content="<?= $ogImage ?>">
+<?php
+$ogImage = !empty($row['PostImage']) ? 'admin/postimages/' . $row['PostImage'] : 'images/logo.png';
+renderMetaTags(
+    $row['posttitle'],
+    mb_substr(strip_tags($row['postdetails'] ?? ''), 0, 297),
+    $ogImage,
+    '/news-details?PostUrl=' . urlencode($row['url']),
+    'article'
+);
+?>
 
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
@@ -307,11 +300,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 $recentThumb = $recent_post['PostImage'] ? 'admin/postimages/' . htmlspecialchars($recent_post['PostImage']) : 'images/blog/post-1.jpg';
                             ?>
                                 <li class="d-flex align-items-start mb-3">
-                                    <a href="news-details.php?PostUrl=<?= urlencode($recent_post['PostUrl']) ?>" class="flex-shrink-0 mr-3">
+                                    <a href="news-details?PostUrl=<?= urlencode($recent_post['PostUrl']) ?>" class="flex-shrink-0 mr-3">
                                         <img src="<?= $recentThumb ?>" alt="<?= htmlspecialchars($recent_post['PostTitle']) ?>" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
                                     </a>
                                     <div>
-                                        <a href="news-details.php?PostUrl=<?= urlencode($recent_post['PostUrl']) ?>" class="text-dark d-block"><?= htmlspecialchars($recent_post['PostTitle']) ?></a>
+                                        <a href="news-details?PostUrl=<?= urlencode($recent_post['PostUrl']) ?>" class="text-dark d-block"><?= htmlspecialchars($recent_post['PostTitle']) ?></a>
                                         <small class="text-muted"><?= date("F j, Y", strtotime($recent_post['PostingDate'])) ?></small>
                                     </div>
                                 </li>
@@ -380,7 +373,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     <div class="comment-form-container mb-5">
                         <h5 class="mb-3">Leave a comment</h5>
-                        <form method="post" action="news-details.php?PostUrl=<?= urlencode($PostUrl) ?>">
+                        <form method="post" action="news-details?PostUrl=<?= urlencode($PostUrl) ?>">
                             <input type="hidden" name="csrftoken" value="<?= htmlspecialchars($csrfToken) ?>">
                             <div class="mb-3">
                                 <input type="text" name="name" class="form-control" placeholder="Your Name" required>
@@ -416,7 +409,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <p class="ms-5"><?= nl2br(htmlspecialchars($comment['comment'])) ?></p>
                             
                             <div class="reply-form-container ms-5 mt-2">
-                                <form method="post" action="news-details.php?PostUrl=<?= urlencode($PostUrl) ?>">
+                                <form method="post" action="news-details?PostUrl=<?= urlencode($PostUrl) ?>">
                                     <input type="hidden" name="csrftoken" value="<?= htmlspecialchars($csrfToken) ?>">
                                     <input type="hidden" name="reply_submit" value="1">
                                     <input type="hidden" name="parent_id" value="<?= $comment['id'] ?>">
@@ -446,7 +439,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $relatedThumb = $related_post['PostImage'] ? 'admin/postimages/' . htmlspecialchars($related_post['PostImage']) : 'images/blog/post-1.jpg';
                         ?>
                             <div class="col-md-4 mb-4">
-                                <a href="news-details.php?PostUrl=<?= urlencode($related_post['PostUrl']) ?>">
+                                <a href="news-details?PostUrl=<?= urlencode($related_post['PostUrl']) ?>">
                                     <img src="<?= $relatedThumb ?>" alt="<?= htmlspecialchars($related_post['PostTitle']) ?>" class="img-fluid rounded mb-2">
                                     <h6 class="text-dark"><?= htmlspecialchars($related_post['PostTitle']) ?></h6>
                                 </a>

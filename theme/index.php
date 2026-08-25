@@ -41,19 +41,12 @@ include('config.php');   ?>
   <link rel="shortcut icon" href="images/logo.png" type="image/x-icon">
   <link rel="icon" href="images/logo.png" type="image/x-icon">
 
-<!-- Open Graph / Facebook -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://inafricaac.org/">
-<meta property="og:title" content="INAfrica Youth Initiative">
-<meta property="og:description" content="INAfrica Youth Initiative: Connecting more than 1.54 Billion African Citizens.">
-<meta property="og:image" content="https://inafricaac.org/images/logo.png">
-
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="https://inafricaac.org/">
-<meta property="twitter:title" content="INAfrica Youth Initiative">
-<meta property="twitter:description" content="INAfrica Youth Initiative: Connecting more than 1.54 Billion African Citizens.">
-<meta property="twitter:image" content="https://inafricaac.org/images/logo.png">
+<?php renderMetaTags(
+  'INAfrica Youth Initiative',
+  'INAfrica Youth Initiative: Connecting more than 1.54 Billion African Citizens.',
+  'images/logo.png',
+  '/'
+); ?>
 
 </head>
 

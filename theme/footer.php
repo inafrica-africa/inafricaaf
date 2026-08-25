@@ -23,9 +23,9 @@
         <div class="col-lg-4 col-md-6 mb-2 text-center text-lg-left">
           <h6>Documents</h6>
           <ul class="list-unstyled small">
-            <li><a href="documents.php?type=Statement">Statements & Publications</a></li>
-            <li><a href="documents.php?type=Letter">Letters</a></li>
-            <li><a href="documents.php?type=Report">Reports</a></li>
+            <li><a href="documents?type=Statement">Statements & Publications</a></li>
+            <li><a href="documents?type=Letter">Letters</a></li>
+            <li><a href="documents?type=Report">Reports</a></li>
           </ul>
         </div>
 
@@ -33,14 +33,14 @@
         <div class="col-lg-4 col-md-6 mb-2 text-center">
           <h6>INAfrica</h6>
           <ul class="list-unstyled small">
-            <li><a href="about.php">About Us</a></li>
-            <li><a href="contact.php">Contact</a></li>
+            <li><a href="about">About Us</a></li>
+            <li><a href="contact">Contact</a></li>
           </ul>
         </div>
 
         <!-- Right: Logo & Contact -->
         <div class="col-lg-4 col-md-12 mb-2 text-center text-lg-right">
-          <a class="logo-footer d-inline-block mb-2 p-2 rounded-circle" href="index.php">
+          <a class="logo-footer d-inline-block mb-2 p-2 rounded-circle" href="index">
             <img src="images/logo.png" alt="logo" class="footer-logo img-fluid">
           </a>
           <ul class="list-unstyled small footer-contact">

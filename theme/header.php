@@ -41,7 +41,7 @@
             </a>
           </li>
           <li class="list-inline-item">
-        <a class="d-inline-block text-color" href="donate.php">Donate</a>
+        <a class="d-inline-block text-color" href="donate">Donate</a>
       </li>
           <li class="list-inline-item">
         <a class="d-inline-block text-color" href="admin/login.php">Staff</a>
@@ -57,7 +57,7 @@
 <div class="navigation w-100">
   <div class="container-fluid">
     <nav class="navbar navbar-expand-lg navbar-dark p-0 d-flex align-items-center">
-      <a class="navbar-brand" href="index.php">
+      <a class="navbar-brand" href="index">
   <img src="images/logo.png" alt="Logo" style="max-height: 90px; margin-right: 10px;">
   <span id="brandText"></span>
 </a>
@@ -69,7 +69,7 @@
       <div class="collapse navbar-collapse" id="mainNav">
         <ul class="navbar-nav">
           <li class="nav-item active">
-            <a class="nav-link" href="index.php">Home</a>
+            <a class="nav-link" href="index">Home</a>
           </li>
           <?php
           if (!function_exists('truncateText')) {
@@ -102,13 +102,13 @@
                       while ($country = mysqli_fetch_assoc($countryQuery)) {
                           $countryId = $country['id'];
                           $countryName = $country['CountryName'];
-                          echo '<li><a class="dropdown-item" href="region.php?region=' . $regionId . '&country=' . $countryId . '">' . htmlspecialchars($countryName) . '</a></li>';
+                          echo '<li><a class="dropdown-item" href="region?region=' . $regionId . '&country=' . $countryId . '">' . htmlspecialchars($countryName) . '</a></li>';
                       }
                       echo '</ul>';
                       echo '</li>';
                   } else {
                       echo '<li class="nav-item">';
-                      echo '<a class="nav-link" href="region.php?region=' . $regionId . '" title="' . htmlspecialchars($regionName) . '">';
+                      echo '<a class="nav-link" href="region?region=' . $regionId . '" title="' . htmlspecialchars($regionName) . '">';
                       echo htmlspecialchars($truncatedRegionName);
                       echo '</a>';
                       echo '</li>';
@@ -117,7 +117,7 @@
           })($con);
           ?>
           <li class="nav-item">
-            <a class="nav-link" href="contact.php">Contact</a>
+            <a class="nav-link" href="contact">Contact</a>
           </li>
         </ul>
       </div>
@@ -128,13 +128,13 @@
 <!-- Sub Navigation (directly attached, right aligned) -->
 <div id="subNav">
   <ul class="navbar-nav d-flex flex-row">
-    <li class="nav-item"><a class="nav-link" href="events.php?type=Event">Events</a></li>
-    <li class="nav-item"><a class="nav-link" href="events.php?type=Summit">Summits</a></li>
-    <li class="nav-item"><a class="nav-link" href="gallery.php">Gallery</a></li>
-    <li class="nav-item"><a class="nav-link" href="documents.php?type=Statement">Statements & Publications</a></li>
-    <li class="nav-item"><a class="nav-link" href="documents.php?type=Letter">Letters</a></li>
-    <li class="nav-item"><a class="nav-link" href="documents.php?type=Report">Reports</a></li>
-    <li class="nav-item"><a class="nav-link" href="about.php">About INAfrica</a></li>
+    <li class="nav-item"><a class="nav-link" href="events?type=Event">Events</a></li>
+    <li class="nav-item"><a class="nav-link" href="events?type=Summit">Summits</a></li>
+    <li class="nav-item"><a class="nav-link" href="gallery">Gallery</a></li>
+    <li class="nav-item"><a class="nav-link" href="documents?type=Statement">Statements & Publications</a></li>
+    <li class="nav-item"><a class="nav-link" href="documents?type=Letter">Letters</a></li>
+    <li class="nav-item"><a class="nav-link" href="documents?type=Report">Reports</a></li>
+    <li class="nav-item"><a class="nav-link" href="about">About INAfrica</a></li>
   </ul>
 </div>
 <script>

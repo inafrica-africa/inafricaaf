@@ -1,13 +1,23 @@
 <?php
 session_start();
-include('config.php');   ?>
+include('config.php');
+
+if (isset($_GET['subcatid'])) {
+    $_SESSION['subcatid'] = intval($_GET['subcatid']);
+}
+
+$subcatName = "Subcategory";
+if (!empty($_SESSION['subcatid'])) {
+    $subcatRow = mysqli_fetch_assoc(mysqli_query($con, "SELECT Subcategory FROM tblsubcategory WHERE SubCategoryId=" . $_SESSION['subcatid']));
+    $subcatName = $subcatRow['Subcategory'] ?? 'Subcategory';
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <?php $siteUrl = 'https://inafricaac.org/'; ?>
     <meta charset="utf-8">
-  <title>INAfrica Youth Initiative.</title>
+  <title><?= htmlspecialchars($subcatName) ?> | INAfrica</title>
 
   <!-- Mobile Specific Metas
   ================================================== -->
@@ -42,11 +52,12 @@ include('config.php');   ?>
   <link rel="icon" href="images/logo.png" type="image/x-icon">
 
 
-<!-- Open Graph / Facebook -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="<?= htmlspecialchars($siteUrl . 'subcategory.php' . (isset($_GET['subcatid']) ? '?subcatid=' . (int) $_GET['subcatid'] : '')) ?>">
-<meta property="og:title" content="INAfrica Youth Initiative">
-<meta property="og:image" content="<?= $siteUrl ?>images/logo.png">
+<?php renderMetaTags(
+  $subcatName . ' | INAfrica',
+  'INAfrica Youth Initiative: Connecting more than 1.54 Billion African Citizens.',
+  'images/logo.png',
+  '/subcategory' . (isset($_GET['subcatid']) ? '?subcatid=' . (int) $_GET['subcatid'] : '')
+); ?>
 
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
@@ -67,11 +78,7 @@ include('config.php');   ?>
 <div class="container">
     <!-- Main Content -->
     <div class="col-md-9">
-      <?php 
-if (isset($_GET['subcatid'])) {
-    $_SESSION['subcatid'] = intval($_GET['subcatid']);
-}
-
+      <?php
 $pageno = isset($_GET['pageno']) ? intval($_GET['pageno']) : 1;
 $no_of_records_per_page = 8;
 $offset = ($pageno - 1) * $no_of_records_per_page;
@@ -103,13 +110,6 @@ $query = mysqli_query($con, "
 
 $rowcount = mysqli_num_rows($query);
 
-// Fetch subcategory name for the heading
-$subcatName = "Subcategory";
-if (!empty($_SESSION['subcatid'])) {
-    $subcatRow = mysqli_fetch_assoc(mysqli_query($con, "SELECT Subcategory FROM tblsubcategory WHERE SubCategoryId=" . $_SESSION['subcatid']));
-    $subcatName = $subcatRow['Subcategory'] ?? 'Subcategory';
-}
-
 if ($rowcount == 0) {
     echo "<p>No records found under <strong>" . htmlentities($subcatName) . "</strong>.</p>";
 } else {
@@ -128,10 +128,10 @@ if ($rowcount == 0) {
             <?php endif; ?>
             <div class="card-body">
                 <p class="mb-1"><small>Posted on <?php echo htmlentities($row['postingdate']); ?></small></p>
-                <a href="news-details.php?PostUrl=<?php echo urlencode($row['PostUrl']); ?>" class="text-decoration-none text-dark">
+                <a href="news-details?PostUrl=<?php echo urlencode($row['PostUrl']); ?>" class="text-decoration-none text-dark">
                     <h2 class="h5"><?php echo htmlentities($row['posttitle']); ?></h2>
                 </a>
-                <a href="news-details.php?PostUrl=<?php echo urlencode($row['PostUrl']); ?>">Read More →</a>
+                <a href="news-details?PostUrl=<?php echo urlencode($row['PostUrl']); ?>">Read More →</a>
             </div>
         </div>
         </div>

@@ -1151,6 +1151,29 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   }
 }
 
+/* Same overflow-clipped-instead-of-scrolled issue as the news-details.php
+   advert row above (body has overflow-x:hidden site-wide, so anything that
+   ends up wider than the viewport gets silently cut off one edge instead of
+   causing a scrollbar) — here it's the "Quotes of the Day" / map / "Recent
+   Updates" hero row on a real phone, where the Slick-carousel'd .hero-slider
+   columns weren't reliably constrained to the viewport width once stacked
+   full-width on mobile. Force every hero-section column and its slider
+   content to actually respect 100% of its own width. */
+@media (max-width: 767px) {
+  .hero-section .row.align-items-center {
+    overflow-x: hidden;
+  }
+  .hero-section .row.align-items-center > [class*="col-"] {
+    max-width: 100%;
+    margin-bottom: 30px;
+  }
+  .hero-section .hero-slider,
+  .hero-section .hero-slider-item {
+    max-width: 100%;
+    overflow: hidden;
+  }
+}
+
 .hero-section h1,
 .hero-section p,
 .hero-section .hero-slider-item {
@@ -1510,6 +1533,7 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
 .post-title {
   font-size: 28px;
   margin-bottom: 14px;
+  text-align: justify;
 }
 @media (max-width: 575px) {
   .post-title {
@@ -1520,6 +1544,9 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   color: #8585a4;
   font-size: 13px;
   margin-bottom: 24px;
+}
+.post-meta .list-inline-item {
+  margin-bottom: 6px;
 }
 .post-meta .list-inline-item:not(:last-child) {
   margin-right: 18px;

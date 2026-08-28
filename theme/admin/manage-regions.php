@@ -6,7 +6,7 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-const MAX_LOGO_BYTES = 3 * 1024 * 1024;
+const MAX_LOGO_BYTES = 2048 * 1024 * 1024;
 $ALLOWED_MIME = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp', 'image/svg+xml' => 'svg'];
 $LOGO_DIR = __DIR__ . '/regionlogos/';
 
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($file['error'] !== UPLOAD_ERR_OK) {
             $error = 'Upload failed (error code ' . $file['error'] . ').';
         } elseif ($file['size'] > MAX_LOGO_BYTES) {
-            $error = 'Logo is too large (max 3MB).';
+            $error = 'Logo is too large (max 2GB).';
         } else {
             $finfo = new finfo(FILEINFO_MIME_TYPE);
             $mime = $finfo->file($file['tmp_name']);

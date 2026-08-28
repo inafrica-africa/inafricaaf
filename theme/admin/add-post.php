@@ -6,7 +6,7 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+const MAX_UPLOAD_BYTES = 2048 * 1024 * 1024;
 $ALLOWED_MIME = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
 $UPLOAD_DIR = __DIR__ . '/postimages/';
 
@@ -18,7 +18,7 @@ function saveUploadedImage($file, $allowedMime, $uploadDir) {
         return [null, 'Upload failed (error code ' . $file['error'] . ').'];
     }
     if ($file['size'] > MAX_UPLOAD_BYTES) {
-        return [null, 'Image is too large (max 5MB).'];
+        return [null, 'Image is too large (max 2GB).'];
     }
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime = $finfo->file($file['tmp_name']);

@@ -6,7 +6,7 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-const MAX_DOC_BYTES = 10 * 1024 * 1024;
+const MAX_DOC_BYTES = 2048 * 1024 * 1024;
 $ALLOWED_DOC_MIME = [
     'application/pdf' => 'pdf',
     'application/msword' => 'doc',
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($file['error'] !== UPLOAD_ERR_OK) {
             $error = 'Upload failed (error code ' . $file['error'] . ').';
         } elseif ($file['size'] > MAX_DOC_BYTES) {
-            $error = 'File is too large (max 10MB).';
+            $error = 'File is too large (max 2GB).';
         } else {
             $finfo = new finfo(FILEINFO_MIME_TYPE);
             $mime = $finfo->file($file['tmp_name']);

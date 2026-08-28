@@ -6,7 +6,7 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-const MAX_QUOTE_IMG_BYTES = 5 * 1024 * 1024;
+const MAX_QUOTE_IMG_BYTES = 2048 * 1024 * 1024;
 $ALLOWED_MIME = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
 $IMG_DIR = __DIR__ . '/quoteimages/';
 
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($file['error'] !== UPLOAD_ERR_OK) {
                     $error = 'Upload failed (error code ' . $file['error'] . ').';
                 } elseif ($file['size'] > MAX_QUOTE_IMG_BYTES) {
-                    $error = 'Image is too large (max 5MB).';
+                    $error = 'Image is too large (max 2GB).';
                 } else {
                     $finfo = new finfo(FILEINFO_MIME_TYPE);
                     $mime = $finfo->file($file['tmp_name']);

@@ -23,7 +23,7 @@ if (!hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'] ?? '')) {
     respondError('Security check failed. Please refresh the page and try again.', 403);
 }
 
-const MAX_CONTENT_IMG_BYTES = 5 * 1024 * 1024;
+const MAX_CONTENT_IMG_BYTES = 2048 * 1024 * 1024;
 $ALLOWED_MIME = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
 $UPLOAD_DIR = __DIR__ . '/postimages/content/';
 
@@ -35,7 +35,7 @@ if ($file['error'] !== UPLOAD_ERR_OK) {
     respondError('Upload failed (error code ' . $file['error'] . ').');
 }
 if ($file['size'] > MAX_CONTENT_IMG_BYTES) {
-    respondError('Image is too large (max 5MB).');
+    respondError('Image is too large (max 2GB).');
 }
 
 $finfo = new finfo(FILEINFO_MIME_TYPE);

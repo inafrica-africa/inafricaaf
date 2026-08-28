@@ -41,8 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($file && $file['error'] !== UPLOAD_ERR_NO_FILE) {
                     if ($file['error'] !== UPLOAD_ERR_OK) {
                         $error = 'Upload failed (error code ' . $file['error'] . ').';
-                    } elseif ($file['size'] > 5 * 1024 * 1024) {
-                        $error = 'Image is too large (max 5MB).';
+                    } elseif ($file['size'] > 2048 * 1024 * 1024) {
+                        $error = 'Image is too large (max 2GB).';
                     } else {
                         $finfo = new finfo(FILEINFO_MIME_TYPE);
                         $mime = $finfo->file($file['tmp_name']);

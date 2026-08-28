@@ -38,9 +38,8 @@ foreach ($initialMessages as $m) {
 </head>
 <body>
   <?php include(__DIR__ . '/../header.php'); ?>
-  <?php networkFlagBanner(); ?>
 
-  <section class="section network-register-section" style="padding-top:20px;">
+  <section class="section network-chat-section">
     <div class="container">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
@@ -51,6 +50,12 @@ foreach ($initialMessages as $m) {
       </div>
 
       <div class="network-chat-shell">
+        <!-- The flag theme lives behind the message text itself, not as its
+             own banner above the interface — a faint, animated layer under
+             the (opaque) message list rather than a separate scrolling
+             strip competing for space above the chat. -->
+        <?php networkFlagBanner(); ?>
+
         <!-- Populated by JS from the initialMessages array (below) using the
              exact same renderMessage() as newly polled/sent messages, so
              there's one rendering implementation, not a PHP one that could
@@ -183,9 +188,17 @@ foreach ($initialMessages as $m) {
         if (mine) {
           items += '<a class="dropdown-item" data-action="delete-everyone">Delete for everyone</a>';
         }
+        // NOT Bootstrap's data-toggle="dropdown" — its JS toggle requires
+        // Popper.js, which isn't loaded anywhere in this theme (bootstrap.min.js
+        // literally contains the string "Popper is required"), so that
+        // toggle silently no-ops on every click. The .dropdown-menu/
+        // .dropdown-item CSS classes are plain CSS with no Popper
+        // involvement, so those are kept; show/hide is a small
+        // dependency-free handler below (see the single document-level
+        // click listener) instead.
         menuHtml =
-          '<div class="dropdown network-message__menu">' +
-            '<button type="button" class="network-message__menu-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Message options">' +
+          '<div class="network-message__menu">' +
+            '<button type="button" class="network-message__menu-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Message options">' +
               '<i class="ti-angle-down"></i>' +
             '</button>' +
             '<div class="dropdown-menu dropdown-menu-right">' + items + '</div>' +
@@ -288,6 +301,36 @@ foreach ($initialMessages as $m) {
     initialMessages.forEach(appendMessage);
     setInterval(poll, 3000);
     scrollToBottom();
+
+    // Per-message options menu: one delegated listener handles every
+    // toggle button (present and future — new messages keep arriving via
+    // polling), opening/closing the sibling .dropdown-menu directly rather
+    // than through Bootstrap's Popper-dependent dropdown JS.
+    document.addEventListener('click', function (e) {
+      var toggle = e.target.closest('.network-message__menu-toggle');
+      if (toggle) {
+        var menu = toggle.parentElement.querySelector('.dropdown-menu');
+        var wasOpen = menu.classList.contains('show');
+        document.querySelectorAll('.network-message__menu .dropdown-menu.show').forEach(function (m) {
+          m.classList.remove('show');
+        });
+        if (!wasOpen) {
+          menu.classList.add('show');
+          toggle.setAttribute('aria-expanded', 'true');
+        } else {
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+        e.stopPropagation();
+        return;
+      }
+      // Any other click (including on a menu item, which also runs its own
+      // data-action handler) closes whatever's open.
+      document.querySelectorAll('.network-message__menu .dropdown-menu.show').forEach(function (m) {
+        m.classList.remove('show');
+        var t = m.parentElement.querySelector('.network-message__menu-toggle');
+        if (t) { t.setAttribute('aria-expanded', 'false'); }
+      });
+    });
 
     $replyCancel.addEventListener('click', function () {
       replyTo = null;

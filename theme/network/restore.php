@@ -59,7 +59,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
   <?php include(__DIR__ . '/../header.php'); ?>
-  <?php networkFlagBanner(); ?>
 
   <section class="section network-register-section">
     <div class="container">

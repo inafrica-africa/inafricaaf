@@ -1,33 +1,43 @@
 /* Networking module — shared styles (registration, restore, chat). */
 
+/* Both clear the site header's `fixed-top` positioning — same reasoning as
+   `.page-title-section` elsewhere (90px desktop, more on mobile where the
+   header stacks into several rows), needed here because the registration
+   form / chat shell is the first thing under the header with nothing else
+   providing that clearance (the flag banner used to double as this on the
+   chat page, back when it was a standalone top strip instead of living
+   behind the message list). */
 .network-register-section {
-  padding-top: 30px;
+  padding-top: 90px;
 }
-
-/* Animated African-flags banner: small CSS-gradient flag chips (see
-   networkFlagBanner() in includes/identity.php — deliberately not Unicode
-   flag emoji, which have a well-known rendering gap on Windows) scrolling
-   across a brand-gradient strip.
-   margin-top clears the site header's `fixed-top` positioning — same
-   ~90px other pages give `.section`/`.page-title-section` for the same
-   reason, since this banner (unlike those) sits directly under the header
-   with nothing else providing that clearance. */
-.network-flag-banner {
-  overflow: hidden;
-  white-space: nowrap;
-  background: linear-gradient(90deg, #2fb44b, #ede32b, #29abe2);
-  padding: 10px 0;
-  position: relative;
-  margin-top: 90px;
+.network-chat-section {
+  padding-top: 110px;
 }
 @media (max-width: 767px) {
-  .network-flag-banner {
-    margin-top: 280px;
+  .network-register-section,
+  .network-chat-section {
+    padding-top: 300px;
   }
+}
+
+/* Animated African-flags theme: small CSS-gradient flag chips (see
+   networkFlagBanner() in includes/identity.php — deliberately not Unicode
+   flag emoji, which have a well-known rendering gap on Windows) scrolling
+   behind the message text itself — a faint, moving layer under the
+   (opaque) message list, not a separate banner competing for space above
+   the chat. */
+.network-flag-banner {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  opacity: 0.16;
+  pointer-events: none;
 }
 .network-flag-banner__track {
   display: inline-flex;
   align-items: center;
+  height: 100%;
   padding-left: 100%;
   gap: 18px;
   animation: network-flag-scroll 45s linear infinite;
@@ -38,7 +48,6 @@
   width: 40px;
   height: 26px;
   border-radius: 3px;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.15), 0 1px 3px rgba(0,0,0,.25);
 }
 @keyframes network-flag-scroll {
   0%   { transform: translateX(0); }
@@ -52,6 +61,7 @@
 
 /* Chat shell */
 .network-chat-shell {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: calc(100vh - 260px);
@@ -62,6 +72,8 @@
   background: #f7f7fb;
 }
 .network-chat-messages {
+  position: relative;
+  z-index: 1;
   flex: 1 1 auto;
   overflow-y: auto;
   padding: 16px;
@@ -177,6 +189,17 @@
 .network-message__menu-toggle:focus {
   color: #333;
   outline: none;
+}
+/* Positioning made explicit here rather than relying on Bootstrap's own
+   .dropdown rule (this build's dropdown.js needs Popper.js for its JS
+   toggle, which isn't loaded anywhere in this theme — confirmed by the
+   literal "Popper is required" string baked into bootstrap.min.js — so
+   Bootstrap's own toggle silently no-ops on every click. The .dropdown-menu/
+   .dropdown-item CSS classes themselves are plain CSS with no Popper
+   involvement at all, so they're kept; only the show/hide is now a small
+   dependency-free click handler in chat.php instead of data-toggle). */
+.network-message__menu {
+  position: relative;
 }
 .network-message__menu .dropdown-menu {
   font-size: 13px;

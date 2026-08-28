@@ -9,6 +9,7 @@ if (empty($_SESSION['csrf_token'])) {
 const MAX_UPLOAD_BYTES = 2048 * 1024 * 1024;
 $ALLOWED_MIME = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
 $UPLOAD_DIR = __DIR__ . '/postimages/';
+$LANGUAGES = ['English', 'Swahili', 'French'];
 
 function saveUploadedImage($file, $allowedMime, $uploadDir) {
     if (!isset($file) || $file['error'] === UPLOAD_ERR_NO_FILE) {
@@ -49,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $regionId = intval($_POST['region_id'] ?? 0) ?: null;
         $countryId = intval($_POST['country_id'] ?? 0) ?: null;
         $details = $_POST['post_details'] ?? '';
+        $language = in_array($_POST['language'] ?? '', $LANGUAGES, true) ? $_POST['language'] : 'English';
 
         if ($title === '' || !$regionId || trim(strip_tags($details)) === '') {
             $error = 'Title, category, and post content are required.';
@@ -67,12 +69,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $postedBy = $_SESSION['admin_name'] ?? 'Admin';
                 $stmt = $con->prepare("
-                    INSERT INTO tblposts (PostTitle, RegionId, CountryId, PostDetails, PostUrl, PostImage, Is_Active, postedBy, viewCounter, share_count, Status)
-                    VALUES (?, ?, ?, ?, ?, ?, 1, ?, 0, 0, 'Approved')
+                    INSERT INTO tblposts (PostTitle, Language, RegionId, CountryId, PostDetails, PostUrl, PostImage, Is_Active, postedBy, viewCounter, share_count, Status)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, 0, 0, 'Approved')
                 ");
                 $stmt->bind_param(
-                    "siissss",
+                    "ssiissss",
                     $title,
+                    $language,
                     $regionId,
                     $countryId,
                     $details,
@@ -154,6 +157,15 @@ require_once __DIR__ . '/../includes/leftsidebar.php';
                             <div class="form-group">
                                 <label>Post Title</label>
                                 <input type="text" name="post_title" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Language</label>
+                                <select name="language" class="form-control">
+                                    <?php foreach ($LANGUAGES as $lang): ?>
+                                        <option value="<?= htmlspecialchars($lang) ?>"><?= htmlspecialchars($lang) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
 
                             <div class="form-row">

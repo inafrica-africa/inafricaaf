@@ -254,6 +254,9 @@ foreach ($initialMessages as $m) {
           }
         });
       } else if (action === 'delete-me') {
+        if (!window.confirm('Delete this message for you? Other people will still see it.')) {
+          return;
+        }
         postForm('network/api/delete-message', { message_id: msg.id, mode: 'me' }).then(function (data) {
           if (data.ok) {
             var el = $messages.querySelector('[data-message-id="' + msg.id + '"]');

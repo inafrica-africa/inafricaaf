@@ -165,23 +165,34 @@ foreach ($initialMessages as $m) {
         }
       }
 
-      var actions = '';
+      // A small caret in the bubble's corner opens a dropdown (Bootstrap's
+      // own dropdown component, already loaded — same data-toggle pattern
+      // used elsewhere in the theme) instead of a permanent row of text
+      // links under every message.
+      var menuHtml = '';
       if (!msg.isDeletedForEveryone) {
-        actions += '<a data-action="reply">Reply</a>';
-        actions += '<a data-action="forward">Forward</a>';
-        actions += '<a data-action="delete-me">Delete for me</a>';
+        var items = '<a class="dropdown-item" data-action="reply">Reply</a>' +
+          '<a class="dropdown-item" data-action="forward">Forward</a>' +
+          '<a class="dropdown-item" data-action="delete-me">Delete for me</a>';
         if (mine) {
-          actions += '<a data-action="delete-everyone">Delete for everyone</a>';
+          items += '<a class="dropdown-item" data-action="delete-everyone">Delete for everyone</a>';
         }
+        menuHtml =
+          '<div class="dropdown network-message__menu">' +
+            '<button type="button" class="network-message__menu-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Message options">' +
+              '<i class="ti-angle-down"></i>' +
+            '</button>' +
+            '<div class="dropdown-menu dropdown-menu-right">' + items + '</div>' +
+          '</div>';
       }
 
       wrap.innerHTML =
         '<div class="network-message__bubble">' +
+          menuHtml +
           (mine ? '' : '<div class="network-message__meta"><strong>' + escapeHtml(msg.senderName) + '</strong>' +
             '<span class="network-message__status-badge">' + escapeHtml(msg.senderStatus) + '</span></div>') +
           bodyHtml +
-        '</div>' +
-        '<div class="network-message__actions">' + actions + '</div>';
+        '</div>';
 
       wrap.querySelectorAll('[data-action]').forEach(function (el) {
         el.addEventListener('click', function () {

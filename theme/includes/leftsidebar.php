@@ -108,6 +108,17 @@
                                     <li><a href="manage-adverts.php">Manage Adverts</a></li>
                                 </ul>
                             </li>
+
+                            <li class="has_sub">
+                                <a href="javascript:void(0);" class="waves-effect"><i class="mdi mdi-account-group-outline"></i> <span> Networking </span> <span class="menu-arrow"></span></a>
+                                <ul class="list-unstyled">
+                                    <li><a href="network-users.php">Registered Users</a></li>
+                                    <li><a href="network-stats.php">Statistics</a></li>
+                                    <li><a href="network-messages.php">Moderate Messages</a></li>
+                                    <li><a href="network-countries.php">Country/Status Settings</a></li>
+                                    <li><a href="network-export.php">Export Users (CSV)</a></li>
+                                </ul>
+                            </li>
                         </ul>
                     </div>
                     <!-- Sidebar -->

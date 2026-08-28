@@ -21,6 +21,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute();
             $stmt->close();
             $success = 'User status updated.';
+        } elseif ($action === 'delete' && $id > 0) {
+            // "Remove" (toggle, above) only deactivates — this is the actual
+            // permanent delete: the user, every device that ever logged in
+            // as them, every message they sent (and its media file on
+            // disk), and every "delete for me" they'd set on others'
+            // messages. Irreversible, unlike toggle.
+            $mediaDir = __DIR__ . '/../network/media/';
+            $stmt = $con->prepare("SELECT MediaPath FROM tblnetworkmessages WHERE UserId = ? AND MediaPath IS NOT NULL");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $mediaFiles = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+            foreach ($mediaFiles as $m) {
+                @unlink($mediaDir . basename($m['MediaPath']));
+            }
+
+            $stmt = $con->prepare("
+                DELETE FROM tblnetworkmessagehidden
+                WHERE UserId = ? OR MessageId IN (SELECT id FROM tblnetworkmessages WHERE UserId = ?)
+            ");
+            $stmt->bind_param("ii", $id, $id);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $con->prepare("DELETE FROM tblnetworkmessages WHERE UserId = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $con->prepare("DELETE FROM tblnetworkdevices WHERE UserId = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
+
+            $stmt = $con->prepare("DELETE FROM tblnetworkusers WHERE id = ?");
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
+
+            $success = 'User permanently deleted, along with their messages and devices.';
         }
     }
 }
@@ -139,6 +179,12 @@ require_once __DIR__ . '/../includes/leftsidebar.php';
                                                     <button type="submit" class="btn btn-sm <?= $u['Is_Active'] ? 'btn-danger' : 'btn-success' ?>">
                                                         <?= $u['Is_Active'] ? 'Remove' : 'Restore' ?>
                                                     </button>
+                                                </form>
+                                                <form method="post" style="display:inline;" onsubmit="return confirm('Permanently delete &quot;<?= htmlspecialchars(addslashes($u['Name'])) ?>&quot;? This removes the user, all their messages, and their devices for good — it cannot be undone.');">
+                                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                                                    <input type="hidden" name="action" value="delete">
+                                                    <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete Permanently</button>
                                                 </form>
                                             </td>
                                         </tr>

@@ -65,22 +65,18 @@ foreach ($initialMessages as $m) {
             <button type="button" class="close float-right" id="network-reply-cancel" aria-label="Cancel reply">&times;</button>
             <div id="network-reply-preview-text"></div>
           </div>
-          <form id="network-composer-form">
-            <div class="form-row align-items-end">
-              <div class="col-auto">
-                <input type="file" id="network-media-input" accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm,video/quicktime" style="display:none;">
-                <button type="button" id="network-media-btn" class="btn btn-outline-secondary btn-sm" title="Attach image or video (max 90s)">
-                  <i class="ti-image"></i>
-                </button>
-              </div>
-              <div class="col">
-                <textarea id="network-text-input" class="form-control" rows="1" placeholder="Type a message..."></textarea>
-                <div id="network-media-preview" class="small text-muted mt-1"></div>
-              </div>
-              <div class="col-auto">
-                <button type="submit" class="btn btn-primary btn-sm">Send</button>
-              </div>
+          <form id="network-composer-form" class="network-composer-row">
+            <input type="file" id="network-media-input" accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm,video/quicktime" style="display:none;">
+            <button type="button" id="network-media-btn" class="network-composer-icon-btn" title="Attach image or video (max 90s)">
+              <i class="ti-image"></i>
+            </button>
+            <div class="network-composer-text-wrap">
+              <textarea id="network-text-input" class="form-control" rows="1" placeholder="Type a message..."></textarea>
+              <div id="network-media-preview" class="small text-muted"></div>
             </div>
+            <button type="submit" class="network-composer-send-btn" title="Send">
+              <i class="ti-arrow-right"></i>
+            </button>
           </form>
         </div>
       </div>
@@ -107,6 +103,16 @@ foreach ($initialMessages as $m) {
     var $replyPreview = document.getElementById('network-reply-preview');
     var $replyPreviewText = document.getElementById('network-reply-preview-text');
     var $replyCancel = document.getElementById('network-reply-cancel');
+
+    // Auto-grow the composer textarea as you type, like WhatsApp's input —
+    // a fixed single-line box was clipping longer messages down to a tiny
+    // scrollable sliver instead of the box itself getting taller.
+    var TEXTAREA_MAX_HEIGHT = 120;
+    function autoGrowTextarea() {
+      $textInput.style.height = 'auto';
+      $textInput.style.height = Math.min($textInput.scrollHeight, TEXTAREA_MAX_HEIGHT) + 'px';
+    }
+    $textInput.addEventListener('input', autoGrowTextarea);
 
     function escapeHtml(str) {
       var div = document.createElement('div');
@@ -186,11 +192,18 @@ foreach ($initialMessages as $m) {
           '</div>';
       }
 
+      // meta and the menu toggle are flex siblings in a shared header row,
+      // not one absolutely-positioned over the other — the previous
+      // absolute-positioned toggle sat directly on top of the sender
+      // name/status badge for received messages, both visually colliding
+      // and (since the badge was painted after it in DOM order) eating the
+      // tap before it ever reached the button.
+      var metaHtml = mine ? '<span></span>' : '<div class="network-message__meta"><strong>' + escapeHtml(msg.senderName) + '</strong>' +
+        '<span class="network-message__status-badge">' + escapeHtml(msg.senderStatus) + '</span></div>';
+
       wrap.innerHTML =
         '<div class="network-message__bubble">' +
-          menuHtml +
-          (mine ? '' : '<div class="network-message__meta"><strong>' + escapeHtml(msg.senderName) + '</strong>' +
-            '<span class="network-message__status-badge">' + escapeHtml(msg.senderStatus) + '</span></div>') +
+          (menuHtml ? '<div class="network-message__header">' + metaHtml + menuHtml + '</div>' : (mine ? '' : metaHtml)) +
           bodyHtml +
         '</div>';
 
@@ -331,6 +344,7 @@ foreach ($initialMessages as $m) {
           if (data.ok) {
             appendMessage(data.message);
             $textInput.value = '';
+            autoGrowTextarea();
             $mediaInput.value = '';
             $mediaPreview.textContent = '';
             replyTo = null;

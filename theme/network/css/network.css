@@ -82,7 +82,7 @@
 .network-message__bubble {
   position: relative;
   display: inline-block;
-  padding: 10px 30px 10px 14px;
+  padding: 10px 14px;
   border-radius: 14px;
   background: #fff;
   box-shadow: 0 1px 2px rgba(0,0,0,.08);
@@ -101,10 +101,21 @@
 .network-message--mine .network-message__bubble {
   background: #dcf8c6;
 }
+/* The meta line (sender name + status badge, received messages only) and
+   the options-menu toggle are flex siblings on one row — real layout, not
+   one absolutely-positioned over the other, so they can never visually
+   collide or steal each other's taps. */
+.network-message__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 2px;
+}
 .network-message__meta {
   font-size: 11px;
   color: #8585a4;
-  margin-top: 2px;
+  min-width: 0;
 }
 .network-message__status-badge {
   display: inline-block;
@@ -150,17 +161,15 @@
    used to be a permanent row of "Reply / Forward / Delete for me / Delete
    for everyone" text under every single message. */
 .network-message__menu-toggle {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 20px;
-  height: 20px;
-  line-height: 20px;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  line-height: 22px;
   text-align: center;
   border: 0;
   background: transparent;
   color: #8585a4;
-  font-size: 11px;
+  font-size: 12px;
   padding: 0;
   cursor: pointer;
 }
@@ -188,4 +197,48 @@
   margin-bottom: 8px;
   font-size: 13px;
   display: none;
+}
+
+/* Composer: a plain flex row (not Bootstrap's grid columns, which were
+   squeezing the text field down to almost nothing on narrow phone screens
+   once a text-labelled Send button and an attach button both claimed
+   fixed-width columns) — attach/send are fixed-size circular icon buttons
+   that never shrink, the text field takes all remaining width and grows
+   with its content (see autoGrowTextarea() in chat.php) instead of a
+   single fixed-height line, matching how WhatsApp's own input behaves. */
+.network-composer-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.network-composer-icon-btn,
+.network-composer-send-btn {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+}
+.network-composer-icon-btn {
+  background: #f0f0f5;
+  color: #555;
+}
+.network-composer-send-btn {
+  background: #2fb44b;
+  color: #fff;
+}
+.network-composer-text-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.network-composer-text-wrap textarea {
+  resize: none;
+  overflow-y: auto;
+  max-height: 120px;
+  line-height: 1.4;
 }

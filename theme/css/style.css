@@ -609,8 +609,12 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   margin: 0 auto;
 }
 
-/* Post body content: any image dropped into Summernote fits the screen and
-   centers automatically, no manual resizing needed. */
+/* Post body content: justified text (even left and right edges), plus any
+   image dropped into Summernote fits the screen and centers automatically,
+   no manual resizing needed. */
+.content {
+  text-align: justify;
+}
 .content img {
   max-width: 100%;
   height: auto;
@@ -975,6 +979,35 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   }
   .footer-logo {
     max-height: 36px;
+  }
+}
+
+/* Below ~576px (a real phone, not a tablet) three squeezed columns at 28%/
+   28%/44% stop working — the contact column especially (logo + phone + 2
+   emails) has no room left and collides with its neighbor. Let all three
+   stack full-width instead, same as Bootstrap's own default; the
+   side-by-side layout above stays for tablet-width screens where three
+   narrow columns still have enough room. */
+@media (max-width: 575px) {
+  .footer .row {
+    flex-wrap: wrap;
+  }
+  .footer .row > [class*="col-"] {
+    max-width: 100%;
+    flex: 0 0 100%;
+    border-right: 0 !important;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  .footer .row > [class*="col-"]:last-child {
+    max-width: 100%;
+  }
+  .footer h6 {
+    font-size: 13px;
+  }
+  .footer a,
+  .footer-contact li {
+    font-size: 13px;
   }
 }
 

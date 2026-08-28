@@ -41,22 +41,38 @@ const NETWORK_FLAGS = [
     ['Tanzania', 'h', ['#1eb53a', '#000000', '#00a3dd']],
 ];
 
-function networkFlagBanner() {
-    $chips = '';
-    foreach (NETWORK_FLAGS as [$name, $direction, $colors]) {
-        $stops = [];
-        $step = 100 / count($colors);
-        foreach ($colors as $i => $color) {
-            $from = round($i * $step, 2);
-            $to = round(($i + 1) * $step, 2);
-            $stops[] = "$color {$from}%";
-            $stops[] = "$color {$to}%";
-        }
-        $gradientDir = $direction === 'v' ? 'to right' : 'to bottom';
-        $style = 'background: linear-gradient(' . $gradientDir . ', ' . implode(', ', $stops) . ');';
-        $chips .= '<span class="network-flag" title="' . htmlspecialchars($name) . '" style="' . $style . '"></span>';
+function networkFlagChipStyle($colors, $direction) {
+    $stops = [];
+    $step = 100 / count($colors);
+    foreach ($colors as $i => $color) {
+        $from = round($i * $step, 2);
+        $to = round(($i + 1) * $step, 2);
+        $stops[] = "$color {$from}%";
+        $stops[] = "$color {$to}%";
     }
-    echo '<div class="network-flag-banner"><div class="network-flag-banner__track">' . $chips . $chips . '</div></div>';
+    $gradientDir = $direction === 'v' ? 'to right' : 'to bottom';
+    return 'background: linear-gradient(' . $gradientDir . ', ' . implode(', ', $stops) . ');';
+}
+
+// Four vertical lanes side by side, each scrolling independently — odd
+// lanes top-to-bottom, even lanes bottom-to-top — rather than one single
+// horizontal strip, per request ("like 4 parallel vertically").
+function networkFlagBanner() {
+    $lanes = array_chunk(NETWORK_FLAGS, (int) ceil(count(NETWORK_FLAGS) / 4));
+    $lanesHtml = '';
+    foreach ($lanes as $laneIndex => $laneFlags) {
+        $chips = '';
+        foreach ($laneFlags as [$name, $direction, $colors]) {
+            $style = networkFlagChipStyle($colors, $direction);
+            $chips .= '<span class="network-flag" title="' . htmlspecialchars($name) . '" style="' . $style . '"></span>';
+        }
+        // Doubled for the seamless loop, same trick as the old horizontal
+        // track but scrolling on the Y axis now.
+        $directionClass = $laneIndex % 2 === 0 ? 'network-flag-lane--down' : 'network-flag-lane--up';
+        $lanesHtml .= '<div class="network-flag-lane ' . $directionClass . '"><div class="network-flag-lane__track">'
+            . $chips . $chips . '</div></div>';
+    }
+    echo '<div class="network-flag-banner">' . $lanesHtml . '</div>';
 }
 
 // Returns the tblnetworkusers row (with id, Name, WhatsApp, Email, Status,

@@ -25,36 +25,55 @@
    flag emoji, which have a well-known rendering gap on Windows) scrolling
    behind the message text itself — a faint, moving layer under the
    (opaque) message list, not a separate banner competing for space above
-   the chat. */
+   the chat. Four vertical lanes side by side, alternating scroll direction
+   (odd lanes drift down, even lanes drift up) rather than one horizontal
+   strip. */
 .network-flag-banner {
   position: absolute;
   inset: 0;
+  display: flex;
   overflow: hidden;
-  white-space: nowrap;
   opacity: 0.16;
   pointer-events: none;
 }
-.network-flag-banner__track {
-  display: inline-flex;
+.network-flag-lane {
+  flex: 1 1 0;
+  overflow: hidden;
+}
+.network-flag-lane__track {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  height: 100%;
-  padding-left: 100%;
   gap: 18px;
-  animation: network-flag-scroll 45s linear infinite;
+}
+.network-flag-lane--down .network-flag-lane__track {
+  animation: network-flag-scroll-down 30s linear infinite;
+}
+.network-flag-lane--up .network-flag-lane__track {
+  animation: network-flag-scroll-up 30s linear infinite;
 }
 .network-flag {
-  display: inline-block;
+  display: block;
   flex: none;
   width: 40px;
   height: 26px;
   border-radius: 3px;
 }
-@keyframes network-flag-scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
+/* Content is doubled (see networkFlagBanner()), so the track is exactly
+   2x one copy's height — animating between translateY(0) and
+   translateY(-50%) shifts by precisely one copy-height, at which point
+   the (identical) second copy sits exactly where the first started, and
+   the loop repeats with no visible seam or jump. */
+@keyframes network-flag-scroll-down {
+  0%   { transform: translateY(-50%); }
+  100% { transform: translateY(0); }
+}
+@keyframes network-flag-scroll-up {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .network-flag-banner__track {
+  .network-flag-lane__track {
     animation: none;
   }
 }

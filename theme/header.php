@@ -130,6 +130,7 @@
   <ul class="navbar-nav d-flex flex-row">
     <li class="nav-item"><a class="nav-link" href="events?type=Event">Events</a></li>
     <li class="nav-item"><a class="nav-link" href="events?type=Summit">Summits</a></li>
+    <li class="nav-item"><a class="nav-link" href="network/">Networking</a></li>
     <li class="nav-item"><a class="nav-link" href="gallery">Gallery</a></li>
     <li class="nav-item"><a class="nav-link" href="documents?type=Statement">Statements & Publications</a></li>
     <li class="nav-item"><a class="nav-link" href="documents?type=Letter">Letters</a></li>

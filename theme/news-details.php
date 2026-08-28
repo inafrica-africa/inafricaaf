@@ -48,6 +48,7 @@ foreach ($potentialUrls as $urlToTry) {
     $stmt = $con->prepare("
         SELECT
             p.PostTitle AS posttitle,
+            p.Language,
             p.PostImage,
             p.PostDetails AS postdetails,
             p.PostingDate AS postingdate,
@@ -158,10 +159,13 @@ $postImage   = $row['PostImage'] ?? '';
 // Not htmlentities()'d: this is trusted admin-authored HTML (from the admin panel's
 // rich-text editor) and needs to render as real markup, not escaped text.
 $postDetails = $row['postdetails'] ?? '';
-$postDate    = htmlentities($row['postingdate'] ?? '', ENT_QUOTES, 'UTF-8');
-$category    = htmlentities($row['category']    ?? '', ENT_QUOTES, 'UTF-8');
-$subCategory = htmlentities($row['subcategory'] ?? '', ENT_QUOTES, 'UTF-8');
-$postedBy    = htmlentities($row['postedby']    ?? '', ENT_QUOTES, 'UTF-8');
+// Same reasoning as $postTitle/$postImage above: raw here, single
+// htmlspecialchars() at each display site.
+$postDate    = $row['postingdate'] ?? '';
+$category    = $row['category']    ?? '';
+$subCategory = $row['subcategory'] ?? '';
+$postedBy    = $row['postedby']    ?? '';
+$language    = $row['Language']    ?? 'English';
 $viewCounter = isset($row['viewCounter']) ? intval($row['viewCounter']) : 0;
 
 
@@ -343,6 +347,9 @@ renderMetaTags(
                         </li>
                         <li class="list-inline-item">
                             <i class="ti-tag mr-2"></i><a href="#" class="text-primary"><?= htmlspecialchars($category) ?></a>
+                        </li>
+                        <li class="list-inline-item">
+                            <span class="badge badge-secondary"><?= htmlspecialchars($language) ?></span>
                         </li>
                         <li class="list-inline-item">
                             <i class="ti-eye mr-2"></i><?= number_format($viewCounter) ?> views

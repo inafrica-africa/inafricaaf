@@ -8,7 +8,7 @@ if (!in_array($type, $validTypes, true)) {
 }
 
 $documents = [];
-$stmt = $con->prepare("SELECT Title, Description, FilePath, UploadDate FROM tbldocuments WHERE DocType = ? AND Is_Active = 1 ORDER BY UploadDate DESC");
+$stmt = $con->prepare("SELECT Title, Language, Description, FilePath, UploadDate FROM tbldocuments WHERE DocType = ? AND Is_Active = 1 ORDER BY UploadDate DESC");
 $stmt->bind_param("s", $type);
 $stmt->execute();
 $documents = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -54,7 +54,10 @@ $pageTitle = $typeLabels[$type];
             <div class="card h-100">
               <div class="card-body">
                 <h5 class="card-title"><?= htmlspecialchars($doc['Title']) ?></h5>
-                <p class="card-text text-muted small"><?= date('F j, Y', strtotime($doc['UploadDate'])) ?></p>
+                <p class="card-text text-muted small">
+                  <?= date('F j, Y', strtotime($doc['UploadDate'])) ?>
+                  &middot; <span class="badge badge-secondary"><?= htmlspecialchars($doc['Language']) ?></span>
+                </p>
                 <?php if (!empty($doc['Description'])): ?>
                   <p class="card-text"><?= htmlspecialchars($doc['Description']) ?></p>
                 <?php endif; ?>

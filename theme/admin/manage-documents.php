@@ -14,6 +14,7 @@ $ALLOWED_DOC_MIME_MP = [
 ];
 $DOC_TYPES_MP = ['Statement', 'Letter', 'Report'];
 $DOC_DIR_MP = __DIR__ . '/documents/';
+$LANGUAGES = ['English', 'Swahili', 'French'];
 
 $error = '';
 $success = '';
@@ -51,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $title = trim($_POST['title'] ?? '');
             $docType = $_POST['doc_type'] ?? '';
             $description = trim($_POST['description'] ?? '');
+            $language = in_array($_POST['language'] ?? '', $LANGUAGES, true) ? $_POST['language'] : 'English';
 
             if ($title === '' || !in_array($docType, $DOC_TYPES_MP, true)) {
                 $error = 'Title and document type are required.';
@@ -88,11 +90,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             @unlink($DOC_DIR_MP . basename($old['FilePath']));
                         }
 
-                        $stmt = $con->prepare("UPDATE tbldocuments SET Title = ?, DocType = ?, Description = ?, FilePath = ? WHERE id = ?");
-                        $stmt->bind_param("ssssi", $title, $docType, $description, $newFilename, $id);
+                        $stmt = $con->prepare("UPDATE tbldocuments SET Title = ?, DocType = ?, Language = ?, Description = ?, FilePath = ? WHERE id = ?");
+                        $stmt->bind_param("sssssi", $title, $docType, $language, $description, $newFilename, $id);
                     } else {
-                        $stmt = $con->prepare("UPDATE tbldocuments SET Title = ?, DocType = ?, Description = ? WHERE id = ?");
-                        $stmt->bind_param("sssi", $title, $docType, $description, $id);
+                        $stmt = $con->prepare("UPDATE tbldocuments SET Title = ?, DocType = ?, Language = ?, Description = ? WHERE id = ?");
+                        $stmt->bind_param("ssssi", $title, $docType, $language, $description, $id);
                     }
                     $stmt->execute();
                     $stmt->close();
@@ -106,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $editId = isset($_GET['edit']) ? intval($_GET['edit']) : 0;
 $editRow = null;
 if ($editId > 0) {
-    $stmt = $con->prepare("SELECT id, Title, DocType, Description, FilePath FROM tbldocuments WHERE id = ?");
+    $stmt = $con->prepare("SELECT id, Title, DocType, Language, Description, FilePath FROM tbldocuments WHERE id = ?");
     $stmt->bind_param("i", $editId);
     $stmt->execute();
     $editRow = $stmt->get_result()->fetch_assoc();
@@ -114,7 +116,7 @@ if ($editId > 0) {
 }
 
 $documents = [];
-$result = mysqli_query($con, "SELECT id, Title, DocType, FilePath, UploadDate, Is_Active FROM tbldocuments ORDER BY UploadDate DESC");
+$result = mysqli_query($con, "SELECT id, Title, DocType, Language, FilePath, UploadDate, Is_Active FROM tbldocuments ORDER BY UploadDate DESC");
 if ($result) {
     $documents = mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
@@ -160,6 +162,14 @@ require_once __DIR__ . '/../includes/leftsidebar.php';
                                 </select>
                             </div>
                             <div class="form-group">
+                                <label>Language</label>
+                                <select name="language" class="form-control">
+                                    <?php foreach ($LANGUAGES as $lang): ?>
+                                        <option value="<?= htmlspecialchars($lang) ?>" <?= $lang === $editRow['Language'] ? 'selected' : '' ?>><?= htmlspecialchars($lang) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label>Description</label>
                                 <textarea name="description" class="form-control" rows="3"><?= htmlspecialchars($editRow['Description'] ?? '') ?></textarea>
                             </div>
@@ -184,6 +194,7 @@ require_once __DIR__ . '/../includes/leftsidebar.php';
                                     <tr>
                                         <th>Title</th>
                                         <th>Type</th>
+                                        <th>Language</th>
                                         <th>Date</th>
                                         <th>Status</th>
                                         <th>Actions</th>
@@ -191,11 +202,12 @@ require_once __DIR__ . '/../includes/leftsidebar.php';
                                 </thead>
                                 <tbody>
                                     <?php if (empty($documents)): ?>
-                                        <tr><td colspan="5" class="text-center text-muted">No documents yet.</td></tr>
+                                        <tr><td colspan="6" class="text-center text-muted">No documents yet.</td></tr>
                                     <?php else: foreach ($documents as $doc): ?>
                                         <tr>
                                             <td><?= htmlspecialchars($doc['Title']) ?></td>
                                             <td><?= htmlspecialchars($doc['DocType']) ?></td>
+                                            <td><?= htmlspecialchars($doc['Language']) ?></td>
                                             <td><?= date('M j, Y', strtotime($doc['UploadDate'])) ?></td>
                                             <td>
                                                 <?php if ($doc['Is_Active']): ?>

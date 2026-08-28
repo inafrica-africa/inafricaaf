@@ -9,6 +9,7 @@ if (empty($_SESSION['csrf_token'])) {
 $UPLOAD_DIR = __DIR__ . '/postimages/';
 $ALLOWED_MIME = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif', 'image/webp' => 'webp'];
 const MAX_UPLOAD_BYTES_MP = 2048 * 1024 * 1024;
+$LANGUAGES = ['English', 'Swahili', 'French'];
 
 function saveUploadedImageMP($file, $allowedMime, $uploadDir) {
     if (!isset($file) || $file['error'] === UPLOAD_ERR_NO_FILE) {
@@ -53,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $regionId = intval($_POST['region_id'] ?? 0) ?: null;
             $countryId = intval($_POST['country_id'] ?? 0) ?: null;
             $details = $_POST['post_details'] ?? '';
+            $language = in_array($_POST['language'] ?? '', $LANGUAGES, true) ? $_POST['language'] : 'English';
 
             if ($title === '' || !$regionId || trim(strip_tags($details)) === '') {
                 $error = 'Title, category, and post content are required.';
@@ -62,11 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $error = $uploadError;
                 } else {
                     if ($newImage) {
-                        $stmt = $con->prepare("UPDATE tblposts SET PostTitle = ?, RegionId = ?, CountryId = ?, PostDetails = ?, PostImage = ? WHERE id = ?");
-                        $stmt->bind_param("siissi", $title, $regionId, $countryId, $details, $newImage, $id);
+                        $stmt = $con->prepare("UPDATE tblposts SET PostTitle = ?, Language = ?, RegionId = ?, CountryId = ?, PostDetails = ?, PostImage = ? WHERE id = ?");
+                        $stmt->bind_param("ssiissi", $title, $language, $regionId, $countryId, $details, $newImage, $id);
                     } else {
-                        $stmt = $con->prepare("UPDATE tblposts SET PostTitle = ?, RegionId = ?, CountryId = ?, PostDetails = ? WHERE id = ?");
-                        $stmt->bind_param("siisi", $title, $regionId, $countryId, $details, $id);
+                        $stmt = $con->prepare("UPDATE tblposts SET PostTitle = ?, Language = ?, RegionId = ?, CountryId = ?, PostDetails = ? WHERE id = ?");
+                        $stmt->bind_param("ssiisi", $title, $language, $regionId, $countryId, $details, $id);
                     }
                     $stmt->execute();
                     $stmt->close();
@@ -92,7 +94,7 @@ if ($result) {
 $editId = isset($_GET['edit']) ? intval($_GET['edit']) : 0;
 $editRow = null;
 if ($editId > 0) {
-    $stmt = $con->prepare("SELECT id, PostTitle, RegionId, CountryId, PostDetails FROM tblposts WHERE id = ?");
+    $stmt = $con->prepare("SELECT id, PostTitle, Language, RegionId, CountryId, PostDetails FROM tblposts WHERE id = ?");
     $stmt->bind_param("i", $editId);
     $stmt->execute();
     $editRow = $stmt->get_result()->fetch_assoc();
@@ -101,7 +103,7 @@ if ($editId > 0) {
 
 $posts = [];
 $result = mysqli_query($con, "
-    SELECT p.id, p.PostTitle, p.PostingDate, p.viewCounter, r.RegionName
+    SELECT p.id, p.PostTitle, p.Language, p.PostingDate, p.viewCounter, r.RegionName
     FROM tblposts p
     LEFT JOIN tblregions r ON r.id = p.RegionId
     WHERE p.Is_Active = 1
@@ -146,6 +148,15 @@ require_once __DIR__ . '/../includes/leftsidebar.php';
                             <div class="form-group">
                                 <label>Post Title</label>
                                 <input type="text" name="post_title" class="form-control" value="<?= htmlspecialchars($editRow['PostTitle']) ?>" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Language</label>
+                                <select name="language" class="form-control">
+                                    <?php foreach ($LANGUAGES as $lang): ?>
+                                        <option value="<?= htmlspecialchars($lang) ?>" <?= $lang === $editRow['Language'] ? 'selected' : '' ?>><?= htmlspecialchars($lang) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
 
                             <div class="form-row">
@@ -194,6 +205,7 @@ require_once __DIR__ . '/../includes/leftsidebar.php';
                                 <thead>
                                     <tr>
                                         <th>Title</th>
+                                        <th>Language</th>
                                         <th>Category</th>
                                         <th>Date</th>
                                         <th>Views</th>
@@ -202,10 +214,11 @@ require_once __DIR__ . '/../includes/leftsidebar.php';
                                 </thead>
                                 <tbody>
                                     <?php if (empty($posts)): ?>
-                                        <tr><td colspan="5" class="text-center text-muted">No posts yet.</td></tr>
+                                        <tr><td colspan="6" class="text-center text-muted">No posts yet.</td></tr>
                                     <?php else: foreach ($posts as $post): ?>
                                         <tr>
                                             <td><?= htmlspecialchars($post['PostTitle']) ?></td>
+                                            <td><?= htmlspecialchars($post['Language']) ?></td>
                                             <td><?= htmlspecialchars($post['RegionName'] ?? '—') ?></td>
                                             <td><?= date('M j, Y', strtotime($post['PostingDate'])) ?></td>
                                             <td><?= number_format((int) $post['viewCounter']) ?></td>

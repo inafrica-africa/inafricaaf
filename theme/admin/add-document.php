@@ -14,6 +14,7 @@ $ALLOWED_DOC_MIME = [
 ];
 $DOC_DIR = __DIR__ . '/documents/';
 $DOC_TYPES = ['Statement', 'Letter', 'Report'];
+$LANGUAGES = ['English', 'Swahili', 'French'];
 
 $error = '';
 $success = '';
@@ -25,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $title = trim($_POST['title'] ?? '');
         $docType = $_POST['doc_type'] ?? '';
         $description = trim($_POST['description'] ?? '');
+        $language = in_array($_POST['language'] ?? '', $LANGUAGES, true) ? $_POST['language'] : 'English';
         $file = $_FILES['document_file'] ?? null;
 
         if ($title === '' || !in_array($docType, $DOC_TYPES, true)) {
@@ -46,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $error = 'Could not save the uploaded file.';
                 } else {
                     $uploadedBy = $_SESSION['admin_name'] ?? 'Admin';
-                    $stmt = $con->prepare("INSERT INTO tbldocuments (Title, DocType, Description, FilePath, UploadedBy, Is_Active) VALUES (?, ?, ?, ?, ?, 1)");
-                    $stmt->bind_param("sssss", $title, $docType, $description, $filename, $uploadedBy);
+                    $stmt = $con->prepare("INSERT INTO tbldocuments (Title, DocType, Language, Description, FilePath, UploadedBy, Is_Active) VALUES (?, ?, ?, ?, ?, ?, 1)");
+                    $stmt->bind_param("ssssss", $title, $docType, $language, $description, $filename, $uploadedBy);
                     $stmt->execute();
                     $stmt->close();
                     $success = 'Document uploaded successfully.';
@@ -89,6 +91,14 @@ require_once __DIR__ . '/../includes/leftsidebar.php';
                                     <option value="">-- Select Type --</option>
                                     <?php foreach ($DOC_TYPES as $type): ?>
                                         <option value="<?= htmlspecialchars($type) ?>"><?= htmlspecialchars($type) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Language</label>
+                                <select name="language" class="form-control">
+                                    <?php foreach ($LANGUAGES as $lang): ?>
+                                        <option value="<?= htmlspecialchars($lang) ?>"><?= htmlspecialchars($lang) ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>

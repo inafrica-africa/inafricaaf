@@ -95,7 +95,18 @@
 				fade: true,
 				dots: hasMultiple
 			});
-			$slider.slickAnimation();
+			// slickAnimation (bundled in slick.min.js) fades each
+			// [data-animation-in] element (photo/year/quote/attribution)
+			// OUT a few seconds after it first appears, and only fades it
+			// back IN on Slick's "afterChange" event — i.e. on the next
+			// slide change. With only one slide, autoplay above is
+			// correctly off, so that event never fires again: the content
+			// fades out once, permanently, and never returns. Skip the
+			// plugin entirely when there's nothing to slide to, so
+			// single-slide content just stays visible with no fade at all.
+			if (hasMultiple) {
+				$slider.slickAnimation();
+			}
 		});
 	}
 

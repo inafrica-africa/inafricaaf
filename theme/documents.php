@@ -8,7 +8,7 @@ if (!in_array($type, $validTypes, true)) {
 }
 
 $documents = [];
-$stmt = $con->prepare("SELECT Title, Language, Description, FilePath, UploadDate FROM tbldocuments WHERE DocType = ? AND Is_Active = 1 ORDER BY UploadDate DESC");
+$stmt = $con->prepare("SELECT Title, Language, Description, FilePath, ThumbnailPath, UploadDate FROM tbldocuments WHERE DocType = ? AND Is_Active = 1 ORDER BY UploadDate DESC");
 $stmt->bind_param("s", $type);
 $stmt->execute();
 $documents = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -52,6 +52,13 @@ $pageTitle = $typeLabels[$type];
         <?php else: foreach ($documents as $doc): ?>
           <div class="col-lg-4 col-sm-6 mb-4">
             <div class="card h-100">
+              <?php if (!empty($doc['ThumbnailPath'])): ?>
+                <img class="card-img-top" src="admin/documents/thumbnails/<?= htmlspecialchars($doc['ThumbnailPath']) ?>" alt="<?= htmlspecialchars($doc['Title']) ?>" style="height:220px; object-fit:cover; object-position:top;">
+              <?php else: ?>
+                <div class="card-img-top post-image-placeholder d-flex align-items-center justify-content-center" style="height:220px;">
+                  <i class="ti-file"></i>
+                </div>
+              <?php endif; ?>
               <div class="card-body">
                 <h5 class="card-title"><?= htmlspecialchars($doc['Title']) ?></h5>
                 <p class="card-text text-muted small">

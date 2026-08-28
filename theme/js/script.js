@@ -69,18 +69,34 @@
 	//Hero Slider (guarded: news-details.php/subcategory.php load this script
 	// without slick.min.js since they have no hero-slider on the page, and
 	// calling a plugin method that was never registered throws)
-	if (typeof $.fn.slick === 'function' && $('.hero-slider').length) {
-		$('.hero-slider').slick({
-			autoplay: true,
-			autoplaySpeed: 7500,
-			pauseOnFocus: false,
-			pauseOnHover: false,
-			infinite: true,
-			arrows: false, // autoplay + swipe already move the slide; arrows aren't needed
-			fade: true,
-			dots: true
+	//
+	// Initialized per-instance (not with one .slick() call across the whole
+	// .hero-slider selector) because this class matches both the quotes
+	// slider and the unrelated "Recent Updates" slider, and each needs its
+	// own slide count checked: with only one slide, autoplay+infinite still
+	// re-triggers the fade transition to that same slide forever, which
+	// reads as a pointless flicker rather than "no sliding" when there's
+	// nothing to slide to.
+	if (typeof $.fn.slick === 'function') {
+		$('.hero-slider').each(function () {
+			var $slider = $(this);
+			var slideCount = $slider.children('.hero-slider-item').length;
+			if (!slideCount) {
+				return;
+			}
+			var hasMultiple = slideCount > 1;
+			$slider.slick({
+				autoplay: hasMultiple,
+				autoplaySpeed: 7500,
+				pauseOnFocus: false,
+				pauseOnHover: false,
+				infinite: hasMultiple,
+				arrows: false, // autoplay + swipe already move the slide; arrows aren't needed
+				fade: true,
+				dots: hasMultiple
+			});
+			$slider.slickAnimation();
 		});
-		$('.hero-slider').slickAnimation();
 	}
 
 	// venobox popup

@@ -1124,6 +1124,18 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
 }
 
+/* The quote attribution ("HE President ... The President of ...") is a long
+   name+title string wearing .btn for its pill styling, but .btn's global
+   white-space:nowrap + overflow:hidden (for its short normal labels, plus
+   the ::before hover-fill animation) clips it mid-word. It isn't a real
+   link here (no href), so let it wrap instead of clipping. */
+.hero-slider-item a.btn {
+  white-space: normal;
+  overflow: visible;
+  height: auto;
+  line-height: 1.4;
+}
+
 /* Quote styling: bold, italic, white with quotation marks */
 .hero-slider-item p {
   font-weight: bold;

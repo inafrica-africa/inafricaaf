@@ -4,9 +4,10 @@
   padding-top: 30px;
 }
 
-/* Animated African-flags banner: Unicode flag emoji scrolling across a
-   brand-gradient strip. No image assets to source/maintain, renders
-   natively in every modern browser.
+/* Animated African-flags banner: small CSS-gradient flag chips (see
+   networkFlagBanner() in includes/identity.php — deliberately not Unicode
+   flag emoji, which have a well-known rendering gap on Windows) scrolling
+   across a brand-gradient strip.
    margin-top clears the site header's `fixed-top` positioning — same
    ~90px other pages give `.section`/`.page-title-section` for the same
    reason, since this banner (unlike those) sits directly under the header
@@ -25,12 +26,19 @@
   }
 }
 .network-flag-banner__track {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   padding-left: 100%;
-  font-size: 28px;
-  line-height: 1;
-  letter-spacing: 14px;
+  gap: 18px;
   animation: network-flag-scroll 45s linear infinite;
+}
+.network-flag {
+  display: inline-block;
+  flex: none;
+  width: 40px;
+  height: 26px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.15), 0 1px 3px rgba(0,0,0,.25);
 }
 @keyframes network-flag-scroll {
   0%   { transform: translateX(0); }

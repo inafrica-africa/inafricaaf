@@ -10,15 +10,53 @@
 const NETWORK_DEVICE_COOKIE = 'inafrica_network_device';
 const NETWORK_DEVICE_COOKIE_TTL = 63072000; // 2 years
 
-// A representative spread of African flag emoji for the animated banner —
-// not all 54 (the strip would just take longer to visibly repeat; these
-// render identically via Unicode regional-indicator pairs, no image assets).
-const NETWORK_FLAG_EMOJIS = '🇰🇪 🇳🇬 🇬🇭 🇿🇦 🇪🇬 🇸🇳 🇷🇼 🇪🇹 🇹🇿 🇺🇬 🇲🇦 🇩🇿 🇨🇮 🇨🇲 🇿🇲 🇿🇼 🇧🇼 🇳🇦 🇲🇿 🇹🇳 🇲🇱 🇧🇫 🇸🇱 🇱🇷 🇸🇩';
+// Deliberately NOT Unicode flag emoji: those are two regional-indicator
+// codepoints that only render as an actual flag glyph if the OS/browser's
+// font has a matching bitmap for that pair — and Windows' default emoji
+// font (Segoe UI Emoji) has a long-standing, well-known gap here, showing
+// either the raw two-letter code or an empty box instead of a flag. Pure
+// CSS gradients on a fixed-size chip render identically everywhere, no
+// font/OS dependency at all. Simplified to each flag's main colour bands
+// (no emblems/stars/crests — illegible at this size on a real flag too).
+const NETWORK_FLAGS = [
+    ['Nigeria', 'v', ['#008751', '#ffffff', '#008751']],
+    ['Ghana', 'h', ['#ce1126', '#fcd116', '#006b3f']],
+    ['Senegal', 'v', ['#00853f', '#fdef42', '#e31b23']],
+    ['Mali', 'v', ['#14b53a', '#fcd116', '#ce1126']],
+    ['Guinea', 'v', ['#ce1126', '#fcd116', '#009460']],
+    ['Cameroon', 'v', ['#007a5e', '#ce1126', '#fcd116']],
+    ["Cote d'Ivoire", 'v', ['#f77f00', '#ffffff', '#009e60']],
+    ['Ethiopia', 'h', ['#078930', '#fcdd09', '#da121a']],
+    ['Rwanda', 'h', ['#00a1de', '#fad201', '#20603d']],
+    ['Sierra Leone', 'h', ['#1eb53a', '#ffffff', '#0072c6']],
+    ['Egypt', 'h', ['#ce1126', '#ffffff', '#000000']],
+    ['Sudan', 'h', ['#d21034', '#ffffff', '#000000']],
+    ['Burkina Faso', 'h', ['#ef2b2d', '#009e49']],
+    ['Kenya', 'h', ['#000000', '#bb0000', '#006600']],
+    ['Uganda', 'h', ['#000000', '#fcdc04', '#d90000']],
+    ['Morocco', 'h', ['#c1272d', '#c1272d']],
+    ['Algeria', 'v', ['#006233', '#ffffff']],
+    ['Tunisia', 'h', ['#e70013', '#e70013']],
+    ['Zimbabwe', 'h', ['#006400', '#ffd200', '#d40000', '#000000', '#d40000', '#ffd200', '#006400']],
+    ['Tanzania', 'h', ['#1eb53a', '#000000', '#00a3dd']],
+];
 
 function networkFlagBanner() {
-    $flags = htmlspecialchars(NETWORK_FLAG_EMOJIS);
-    echo '<div class="network-flag-banner"><div class="network-flag-banner__track">'
-        . $flags . '&nbsp;&nbsp;&nbsp;' . $flags . '</div></div>';
+    $chips = '';
+    foreach (NETWORK_FLAGS as [$name, $direction, $colors]) {
+        $stops = [];
+        $step = 100 / count($colors);
+        foreach ($colors as $i => $color) {
+            $from = round($i * $step, 2);
+            $to = round(($i + 1) * $step, 2);
+            $stops[] = "$color {$from}%";
+            $stops[] = "$color {$to}%";
+        }
+        $gradientDir = $direction === 'v' ? 'to right' : 'to bottom';
+        $style = 'background: linear-gradient(' . $gradientDir . ', ' . implode(', ', $stops) . ');';
+        $chips .= '<span class="network-flag" title="' . htmlspecialchars($name) . '" style="' . $style . '"></span>';
+    }
+    echo '<div class="network-flag-banner"><div class="network-flag-banner__track">' . $chips . $chips . '</div></div>';
 }
 
 // Returns the tblnetworkusers row (with id, Name, WhatsApp, Email, Status,

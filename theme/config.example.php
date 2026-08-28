@@ -31,7 +31,25 @@ if (!function_exists('renderMetaTags')) {
     // rather than left to each page to get right (or wrong) on its own.
     function renderMetaTags($title, $description, $image, $path, $type = 'website') {
         $url = SITE_URL . $path;
-        $absImage = preg_match('#^https?://#i', $image) ? $image : SITE_URL . '/' . ltrim($image, '/');
+        $isLocal = !preg_match('#^https?://#i', $image);
+        $absImage = $isLocal ? SITE_URL . '/' . ltrim($image, '/') : $image;
+
+        // Real dimensions, not a hardcoded guess: a mismatched og:image:width/
+        // height is worse than none, since some scrapers trust the hint before
+        // (or instead of) re-measuring the image themselves, and crop/reject a
+        // preview that doesn't actually match. Only measurable for images this
+        // server actually has on disk; skip the tags rather than lie for
+        // anything else (a remote URL, or a path that doesn't resolve).
+        $imgWidth = null;
+        $imgHeight = null;
+        if ($isLocal) {
+            $localPath = __DIR__ . '/' . ltrim($image, '/');
+            $size = @getimagesize($localPath);
+            if ($size) {
+                $imgWidth = $size[0];
+                $imgHeight = $size[1];
+            }
+        }
 
         $title = htmlspecialchars($title);
         $description = htmlspecialchars($description);
@@ -47,8 +65,10 @@ if (!function_exists('renderMetaTags')) {
 <meta property="og:title" content="<?= $title ?>">
 <meta property="og:description" content="<?= $description ?>">
 <meta property="og:image" content="<?= $absImage ?>">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<?php if ($imgWidth && $imgHeight): ?>
+<meta property="og:image:width" content="<?= (int) $imgWidth ?>">
+<meta property="og:image:height" content="<?= (int) $imgHeight ?>">
+<?php endif; ?>
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">

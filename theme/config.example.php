@@ -110,6 +110,48 @@ if (!function_exists('generatePdfThumbnail')) {
     }
 }
 
+if (!function_exists('validateNetworkVideo')) {
+    // Networking chat video validation. The file extension/MIME sniff a
+    // caller does before this is not what actually enforces "no voice
+    // notes" — an audio file renamed to .mp4 still passes a MIME check. The
+    // real test is whether ffprobe finds an actual video stream at all.
+    // Runs under a hard timeout (poppler's generatePdfThumbnail() above sets
+    // the same precedent) since this is participant-uploaded, not fully
+    // trusted, input.
+    function validateNetworkVideo($path, $maxDurationSeconds = 90) {
+        $cmd = sprintf(
+            'timeout 10 ffprobe -v error -show_entries stream=codec_type,duration -of json %s 2>&1',
+            escapeshellarg($path)
+        );
+        exec($cmd, $outputLines, $exitCode);
+
+        if ($exitCode !== 0) {
+            return ['ok' => false, 'durationSeconds' => null, 'reason' => 'Could not read this video file.'];
+        }
+
+        $data = json_decode(implode("\n", $outputLines), true);
+        $streams = $data['streams'] ?? [];
+
+        $hasVideoStream = false;
+        $duration = 0.0;
+        foreach ($streams as $stream) {
+            if (($stream['codec_type'] ?? '') === 'video') {
+                $hasVideoStream = true;
+            }
+            $duration = max($duration, (float) ($stream['duration'] ?? 0));
+        }
+
+        if (!$hasVideoStream) {
+            return ['ok' => false, 'durationSeconds' => $duration, 'reason' => 'Audio-only files (voice notes) are not allowed — only images and video.'];
+        }
+        if ($duration > $maxDurationSeconds) {
+            return ['ok' => false, 'durationSeconds' => $duration, 'reason' => 'Video is too long (max ' . $maxDurationSeconds . ' seconds).'];
+        }
+
+        return ['ok' => true, 'durationSeconds' => $duration, 'reason' => null];
+    }
+}
+
 if (!function_exists('getMimeType')) {
     function getMimeType($base64Data) {
         $binary = base64_decode($base64Data, true);

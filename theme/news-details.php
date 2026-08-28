@@ -147,8 +147,14 @@ if ($checkResult->num_rows === 0) {
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 $fullPostUrl = $scheme . $_SERVER['HTTP_HOST'] . '/news-details?PostUrl=' . urlencode($row['url']);
 
-$postTitle   = htmlentities($row['posttitle']   ?? '', ENT_QUOTES, 'UTF-8');
-$postImage   = htmlentities($row['PostImage']   ?? '', ENT_QUOTES, 'UTF-8');
+// Deliberately NOT htmlentities()'d here: every place these are displayed
+// already calls htmlspecialchars() itself (title tag, h1, img alt, share
+// links). Pre-encoding here too meant "&" became "&amp;" a second time,
+// e.g. a real "“" (curly quote) went in as htmlentities' own "&ldquo;" and
+// came out the far end as literal, visible text "&ldquo;" instead of a
+// quote mark.
+$postTitle   = $row['posttitle'] ?? '';
+$postImage   = $row['PostImage'] ?? '';
 // Not htmlentities()'d: this is trusted admin-authored HTML (from the admin panel's
 // rich-text editor) and needs to render as real markup, not escaped text.
 $postDetails = $row['postdetails'] ?? '';

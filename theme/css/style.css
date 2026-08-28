@@ -40,7 +40,7 @@ p, .paragraph {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: #1e1e4b;
+  color: #000;
   font-family: "futura-bold";
   font-weight: 700;
   line-height: 1.2;
@@ -347,7 +347,7 @@ a h4:hover {
 }
 
 .text-dark {
-  color: #1e1e4b !important;
+  color: #000 !important;
 }
 
 .font-secondary {

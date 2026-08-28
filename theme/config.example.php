@@ -80,6 +80,36 @@ if (!function_exists('renderMetaTags')) {
     }
 }
 
+if (!function_exists('generatePdfThumbnail')) {
+    // Renders a PDF's first page as a JPEG "cover" thumbnail, so a document
+    // card can show what it actually is instead of just a title and a
+    // download button. Uses poppler's pdftoppm (not ImageMagick+Ghostscript
+    // — that combo has a real history of PDF-triggered RCEs) with a hard
+    // timeout, since this runs on admin-uploaded, not fully trusted, input.
+    // Returns the thumbnail's bare filename on success, or null if
+    // generation isn't possible (not a PDF, corrupt file, tool missing,
+    // timed out) — callers should treat a missing thumbnail as normal and
+    // fall back to a generic file icon, not an error.
+    function generatePdfThumbnail($pdfPath, $outputDir) {
+        $basename = bin2hex(random_bytes(16));
+        $outputBase = $outputDir . $basename;
+
+        $cmd = sprintf(
+            'timeout 20 pdftoppm -jpeg -f 1 -l 1 -scale-to-x 800 -scale-to-y -1 -singlefile %s %s 2>&1',
+            escapeshellarg($pdfPath),
+            escapeshellarg($outputBase)
+        );
+        exec($cmd, $outputLines, $exitCode);
+
+        $thumbnailPath = $outputBase . '.jpg';
+        if ($exitCode !== 0 || !is_file($thumbnailPath)) {
+            @unlink($thumbnailPath);
+            return null;
+        }
+        return $basename . '.jpg';
+    }
+}
+
 if (!function_exists('getMimeType')) {
     function getMimeType($base64Data) {
         $binary = base64_decode($base64Data, true);

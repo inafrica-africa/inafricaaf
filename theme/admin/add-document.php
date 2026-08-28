@@ -13,6 +13,7 @@ $ALLOWED_DOC_MIME = [
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
 ];
 $DOC_DIR = __DIR__ . '/documents/';
+$THUMB_DIR = __DIR__ . '/documents/thumbnails/';
 $DOC_TYPES = ['Statement', 'Letter', 'Report'];
 $LANGUAGES = ['English', 'Swahili', 'French'];
 
@@ -47,9 +48,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!move_uploaded_file($file['tmp_name'], $DOC_DIR . $filename)) {
                     $error = 'Could not save the uploaded file.';
                 } else {
+                    // Front page as thumbnail — PDFs only (DOC/DOCX have no
+                    // cheap way to rasterize without a much heavier
+                    // dependency like LibreOffice). Best-effort: a card just
+                    // falls back to a generic icon if this comes back null.
+                    $thumbnail = $mime === 'application/pdf'
+                        ? generatePdfThumbnail($DOC_DIR . $filename, $THUMB_DIR)
+                        : null;
+
                     $uploadedBy = $_SESSION['admin_name'] ?? 'Admin';
-                    $stmt = $con->prepare("INSERT INTO tbldocuments (Title, DocType, Language, Description, FilePath, UploadedBy, Is_Active) VALUES (?, ?, ?, ?, ?, ?, 1)");
-                    $stmt->bind_param("ssssss", $title, $docType, $language, $description, $filename, $uploadedBy);
+                    $stmt = $con->prepare("INSERT INTO tbldocuments (Title, DocType, Language, Description, FilePath, ThumbnailPath, UploadedBy, Is_Active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
+                    $stmt->bind_param("sssssss", $title, $docType, $language, $description, $filename, $thumbnail, $uploadedBy);
                     $stmt->execute();
                     $stmt->close();
                     $success = 'Document uploaded successfully.';

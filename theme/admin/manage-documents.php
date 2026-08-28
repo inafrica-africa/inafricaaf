@@ -14,6 +14,7 @@ $ALLOWED_DOC_MIME_MP = [
 ];
 $DOC_TYPES_MP = ['Statement', 'Letter', 'Report'];
 $DOC_DIR_MP = __DIR__ . '/documents/';
+$THUMB_DIR_MP = __DIR__ . '/documents/thumbnails/';
 $LANGUAGES = ['English', 'Swahili', 'French'];
 
 $error = '';
@@ -33,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
             $success = 'Document status updated.';
         } elseif ($action === 'delete' && $id > 0) {
-            $stmt = $con->prepare("SELECT FilePath FROM tbldocuments WHERE id = ?");
+            $stmt = $con->prepare("SELECT FilePath, ThumbnailPath FROM tbldocuments WHERE id = ?");
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $doc = $stmt->get_result()->fetch_assoc();
@@ -41,6 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($doc) {
                 @unlink(__DIR__ . '/documents/' . basename($doc['FilePath']));
+                if ($doc['ThumbnailPath']) {
+                    @unlink($THUMB_DIR_MP . basename($doc['ThumbnailPath']));
+                }
             }
 
             $delStmt = $con->prepare("DELETE FROM tbldocuments WHERE id = ?");
@@ -81,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!$error) {
                     if ($newFilename) {
-                        $stmt = $con->prepare("SELECT FilePath FROM tbldocuments WHERE id = ?");
+                        $stmt = $con->prepare("SELECT FilePath, ThumbnailPath FROM tbldocuments WHERE id = ?");
                         $stmt->bind_param("i", $id);
                         $stmt->execute();
                         $old = $stmt->get_result()->fetch_assoc();
@@ -89,9 +93,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if ($old && $old['FilePath']) {
                             @unlink($DOC_DIR_MP . basename($old['FilePath']));
                         }
+                        if ($old && $old['ThumbnailPath']) {
+                            @unlink($THUMB_DIR_MP . basename($old['ThumbnailPath']));
+                        }
 
-                        $stmt = $con->prepare("UPDATE tbldocuments SET Title = ?, DocType = ?, Language = ?, Description = ?, FilePath = ? WHERE id = ?");
-                        $stmt->bind_param("sssssi", $title, $docType, $language, $description, $newFilename, $id);
+                        $newThumbnail = $mime === 'application/pdf'
+                            ? generatePdfThumbnail($DOC_DIR_MP . $newFilename, $THUMB_DIR_MP)
+                            : null;
+
+                        $stmt = $con->prepare("UPDATE tbldocuments SET Title = ?, DocType = ?, Language = ?, Description = ?, FilePath = ?, ThumbnailPath = ? WHERE id = ?");
+                        $stmt->bind_param("ssssssi", $title, $docType, $language, $description, $newFilename, $newThumbnail, $id);
                     } else {
                         $stmt = $con->prepare("UPDATE tbldocuments SET Title = ?, DocType = ?, Language = ?, Description = ? WHERE id = ?");
                         $stmt->bind_param("ssssi", $title, $docType, $language, $description, $id);

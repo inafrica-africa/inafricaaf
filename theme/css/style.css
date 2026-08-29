@@ -1237,6 +1237,20 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   }
 }
 
+/* The fixed header is several stacked rows on a real phone (WhatsApp bar,
+   logo row, nav row), and the gap between it and the hero content here was
+   only ~8px at measured widths — reliable in one specific test, but too
+   thin a margin to trust across real devices/font-rendering, where the
+   header could plausibly render a few px taller and start covering the
+   "Quotes of the Day" photo/title. !important because whatever rule is
+   currently winning cascade order here isn't obvious even from reading the
+   stylesheet directly — this forces a real, generous buffer regardless. */
+@media (max-width: 767px) {
+  .hero-section {
+    padding-top: 320px !important;
+  }
+}
+
 /* Prev/next arrows removed entirely (arrows:false in js/script.js's Slick
    init) — the slider autoplays and swipes on its own, and the arrows were
    absolutely positioned 123px below the slider's own bottom edge, spilling

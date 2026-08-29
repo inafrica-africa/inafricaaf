@@ -182,7 +182,14 @@ foreach ($initialMessages as $m) {
       // links under every message.
       var menuHtml = '';
       if (!msg.isDeletedForEveryone) {
-        var items = '<a class="dropdown-item" data-action="reply">Reply</a>' +
+        var items = '';
+        if (msg.text) {
+          // Copy before Reply, matching WhatsApp's own ordering — only
+          // shown when there's actual text to copy (the message itself,
+          // or a caption on media), same as WhatsApp only offering it then.
+          items += '<a class="dropdown-item" data-action="copy">Copy</a>';
+        }
+        items += '<a class="dropdown-item" data-action="reply">Reply</a>' +
           '<a class="dropdown-item" data-action="forward">Forward</a>' +
           '<a class="dropdown-item" data-action="delete-me">Delete for me</a>';
         if (mine) {
@@ -214,10 +221,19 @@ foreach ($initialMessages as $m) {
       var metaHtml = mine ? '<span></span>' : '<div class="network-message__meta"><strong>' + escapeHtml(msg.senderName) + '</strong>' +
         '<span class="network-message__status-badge">' + escapeHtml(msg.senderStatus) + '</span></div>';
 
+      // Read receipt: only meaningful to the sender (same as WhatsApp only
+      // showing it on your own messages), and only once at least one other
+      // person has actually read it.
+      var readHtml = '';
+      if (mine && !msg.isDeletedForEveryone && msg.readCount > 0) {
+        readHtml = '<div class="network-message__read-status"><i class="ti-eye"></i> Read by ' + msg.readCount + '</div>';
+      }
+
       wrap.innerHTML =
         '<div class="network-message__bubble">' +
           (menuHtml ? '<div class="network-message__header">' + metaHtml + menuHtml + '</div>' : (mine ? '' : metaHtml)) +
           bodyHtml +
+          readHtml +
         '</div>';
 
       wrap.querySelectorAll('[data-action]').forEach(function (el) {
@@ -235,8 +251,28 @@ foreach ($initialMessages as $m) {
       scrollToBottom();
     }
 
+    function showToast(text) {
+      var toast = document.createElement('div');
+      toast.textContent = text;
+      toast.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);' +
+        'background:rgba(0,0,0,.8);color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;' +
+        'z-index:2000;pointer-events:none;';
+      document.body.appendChild(toast);
+      setTimeout(function () { toast.remove(); }, 1500);
+    }
+
     function handleAction(action, msg) {
-      if (action === 'reply') {
+      if (action === 'copy') {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(msg.text).then(function () {
+            showToast('Copied');
+          }).catch(function () {
+            window.alert('Could not copy. Long-press the message text to copy it manually.');
+          });
+        } else {
+          window.alert('Copy is not supported in this browser. Long-press the message text to copy it manually.');
+        }
+      } else if (action === 'reply') {
         replyTo = {
           id: msg.id,
           senderName: msg.senderName,

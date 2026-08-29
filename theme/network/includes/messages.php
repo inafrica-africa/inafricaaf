@@ -32,6 +32,43 @@ function networkFetchMessages($con, $myUserId, $sinceId = 0, $limit = 200) {
         return [];
     }
 
+    // Read receipts: an implicit "delivered to this user's screen" marker
+    // recorded the first time their client fetches a message — not a
+    // separate explicit action, same approximation WhatsApp itself uses.
+    // Skipped for the sender's own messages (no point recording someone
+    // "reading" what they just sent) and for tombstoned/deleted rows (no
+    // real content was actually delivered).
+    $toMark = [];
+    foreach ($rows as $row) {
+        if ((int) $row['UserId'] !== (int) $myUserId && !$row['IsDeletedForEveryone']) {
+            $toMark[] = (int) $row['id'];
+        }
+    }
+    if (!empty($toMark)) {
+        $values = implode(',', array_map(function ($id) use ($con, $myUserId) {
+            return '(' . (int) $id . ',' . (int) $myUserId . ')';
+        }, $toMark));
+        mysqli_query($con, "INSERT IGNORE INTO tblnetworkmessagereads (MessageId, UserId) VALUES $values");
+    }
+
+    // Read counts (distinct OTHER users who've read each message) for every
+    // message in this batch — only really meaningful for the sender's own
+    // messages, but computed uniformly here and left to the client to
+    // decide when to actually show it.
+    $allIds = implode(',', array_map(fn($r) => (int) $r['id'], $rows));
+    $readCounts = [];
+    $readResult = mysqli_query($con, "
+        SELECT MessageId, COUNT(DISTINCT UserId) AS Total
+        FROM tblnetworkmessagereads
+        WHERE MessageId IN ($allIds)
+        GROUP BY MessageId
+    ");
+    if ($readResult) {
+        while ($r = mysqli_fetch_assoc($readResult)) {
+            $readCounts[(int) $r['MessageId']] = (int) $r['Total'];
+        }
+    }
+
     // Resolve every distinct reply/forward target referenced by this batch
     // in one extra query, rather than one query per row.
     $refIds = [];
@@ -95,6 +132,7 @@ function networkFetchMessages($con, $myUserId, $sinceId = 0, $limit = 200) {
             'isDeletedForEveryone' => $deleted,
             'isForwarded' => $row['ForwardedFromMessageId'] !== null,
             'replyQuote' => $buildQuote($row['ReplyToMessageId'] ? (int) $row['ReplyToMessageId'] : null),
+            'readCount' => $readCounts[(int) $row['id']] ?? 0,
             'createdDate' => $row['CreatedDate'],
         ];
     }

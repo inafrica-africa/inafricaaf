@@ -31,6 +31,7 @@
 .network-flag-banner {
   position: absolute;
   inset: 0;
+  z-index: 0;
   display: flex;
   overflow: hidden;
   opacity: 0.16;
@@ -118,6 +119,9 @@
   background: #fff;
   box-shadow: 0 1px 2px rgba(0,0,0,.08);
   text-align: left;
+  /* Otherwise inherits the site's default body text color (a grayish
+     #5c5c77, not black) — message text should read as real black. */
+  color: #000;
 }
 /* The classic chat-bubble "cornered" shape — one corner squared off near
    where the tail would be (bottom-right for your own messages, since they
@@ -147,6 +151,12 @@
   font-size: 11px;
   color: #8585a4;
   min-width: 0;
+}
+.network-message__read-status {
+  font-size: 11px;
+  color: #8585a4;
+  margin-top: 4px;
+  text-align: right;
 }
 .network-message__status-badge {
   display: inline-block;

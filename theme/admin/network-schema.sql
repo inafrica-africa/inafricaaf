@@ -77,6 +77,20 @@ CREATE TABLE IF NOT EXISTS tblnetworkmessagehidden (
     UNIQUE KEY uniq_message_user (MessageId, UserId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Read receipts: a row per (message, user) the first time that user's
+-- client fetches the message (via poll or initial page load) — an implicit
+-- "delivered to this user's screen" read marker, not a separate explicit
+-- action, same as WhatsApp's own read-receipt approximation.
+CREATE TABLE IF NOT EXISTS tblnetworkmessagereads (
+    id INT NOT NULL AUTO_INCREMENT,
+    MessageId INT NOT NULL,
+    UserId INT NOT NULL,
+    ReadAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uniq_message_user (MessageId, UserId),
+    KEY idx_message (MessageId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Seed: every country x every status, active by default.
 INSERT IGNORE INTO tblnetworkstatuscountry (CountryId, Status)
 SELECT c.id, s.Status

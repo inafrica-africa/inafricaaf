@@ -6,6 +6,12 @@ $totalUsers = countRows($con, "SELECT COUNT(*) FROM tblnetworkusers WHERE Is_Act
 $totalMessages = countRows($con, "SELECT COUNT(*) FROM tblnetworkmessages WHERE Is_Active = 1");
 $messagesToday = countRows($con, "SELECT COUNT(*) FROM tblnetworkmessages WHERE Is_Active = 1 AND DATE(CreatedDate) = CURDATE()");
 $activeLast7Days = countRows($con, "SELECT COUNT(*) FROM tblnetworkusers WHERE Is_Active = 1 AND LastSeenDate >= NOW() - INTERVAL 7 DAY");
+$totalReads = countRows($con, "SELECT COUNT(*) FROM tblnetworkmessagereads");
+// Read rate: of messages that had at least one other person around to read
+// them (i.e. not the very last message with nobody after it yet), what
+// fraction actually got read by someone. A rough engagement signal, not a
+// per-message guarantee.
+$messagesWithReads = countRows($con, "SELECT COUNT(DISTINCT MessageId) FROM tblnetworkmessagereads");
 
 $byStatus = mysqli_fetch_all(mysqli_query($con, "
     SELECT Status, COUNT(*) AS Total FROM tblnetworkusers WHERE Is_Active = 1 GROUP BY Status ORDER BY Total DESC
@@ -54,6 +60,18 @@ require_once __DIR__ . '/../includes/leftsidebar.php';
                     <div class="card-box text-center">
                         <h2 class="mb-0"><?= number_format($activeLast7Days) ?></h2>
                         <p class="text-muted mb-0">Active in Last 7 Days</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card-box text-center">
+                        <h2 class="mb-0"><?= number_format($totalReads) ?></h2>
+                        <p class="text-muted mb-0">Total Read Receipts</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card-box text-center">
+                        <h2 class="mb-0"><?= number_format($messagesWithReads) ?> / <?= number_format($totalMessages) ?></h2>
+                        <p class="text-muted mb-0">Messages Read By Someone</p>
                     </div>
                 </div>
             </div>

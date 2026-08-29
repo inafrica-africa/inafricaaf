@@ -221,12 +221,12 @@ foreach ($initialMessages as $m) {
       var metaHtml = mine ? '<span></span>' : '<div class="network-message__meta"><strong>' + escapeHtml(msg.senderName) + '</strong>' +
         '<span class="network-message__status-badge">' + escapeHtml(msg.senderStatus) + '</span></div>';
 
-      // Read receipt: only meaningful to the sender (same as WhatsApp only
-      // showing it on your own messages), and only once at least one other
-      // person has actually read it.
+      // View count on every message, not just your own — matching how post
+      // articles on this site already show a public view count to
+      // everyone, not just the author.
       var readHtml = '';
-      if (mine && !msg.isDeletedForEveryone && msg.readCount > 0) {
-        readHtml = '<div class="network-message__read-status"><i class="ti-eye"></i> Read by ' + msg.readCount + '</div>';
+      if (!msg.isDeletedForEveryone && msg.readCount > 0) {
+        readHtml = '<div class="network-message__read-status"><i class="ti-eye"></i> ' + msg.readCount + (msg.readCount === 1 ? ' view' : ' views') + '</div>';
       }
 
       wrap.innerHTML =

@@ -6,8 +6,16 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$error = '';
-$success = '';
+// Flash messages passed via query string after the redirect below, rather
+// than rendered directly from the POST handler — a plain "process POST,
+// then render the same response" leaves the delete/toggle action baked
+// into the browser history, so refreshing this page (or navigating back
+// to it) throws up the browser's native "Confirm Form Resubmission"
+// warning, and clicking through it silently re-runs the action. Redirecting
+// to a GET after every successful POST means there's never a POST response
+// sitting in history to resubmit.
+$error = $_GET['error'] ?? '';
+$success = $_GET['success'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
@@ -63,6 +71,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $success = 'User permanently deleted, along with their messages and devices.';
         }
     }
+
+    // Preserve whatever status/country filter was active (browsers send the
+    // current URL's query string along with a form that has no explicit
+    // action) so the admin lands back on the same filtered view.
+    $redirectParams = [
+        'status' => $_GET['status'] ?? '',
+        'country' => $_GET['country'] ?? '',
+    ];
+    if ($error) {
+        $redirectParams['error'] = $error;
+    } elseif ($success) {
+        $redirectParams['success'] = $success;
+    }
+    header('Location: network-users.php?' . http_build_query(array_filter($redirectParams)));
+    exit;
 }
 
 $statusFilter = $_GET['status'] ?? '';

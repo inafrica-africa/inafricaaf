@@ -8,8 +8,14 @@ if (empty($_SESSION['csrf_token'])) {
 
 const STATUSES = ['NGO', 'Individual', 'Initiative/Movement'];
 
-$success = '';
-$error = '';
+// Flash messages via query string after the redirect below — see
+// network-users.php for why (avoids the browser's "Confirm Form
+// Resubmission" warning on refresh/back after a POST here — worth
+// avoiding especially on this page, since accidentally resubmitting a
+// stale 162-checkbox snapshot would silently revert any changes made
+// since).
+$success = $_GET['success'] ?? '';
+$error = $_GET['error'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
@@ -34,6 +40,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
         $success = 'Country/Status settings saved.';
     }
+
+    $redirectParams = [];
+    if ($error) {
+        $redirectParams['error'] = $error;
+    } elseif ($success) {
+        $redirectParams['success'] = $success;
+    }
+    header('Location: network-countries.php?' . http_build_query($redirectParams));
+    exit;
 }
 
 $countries = mysqli_fetch_all(mysqli_query($con, "SELECT id, CountryName FROM tblcountries ORDER BY CountryName ASC"), MYSQLI_ASSOC);

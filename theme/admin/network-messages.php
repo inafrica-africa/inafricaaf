@@ -6,8 +6,11 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$error = '';
-$success = '';
+// Flash messages via query string after the redirect below — see
+// network-users.php for why (avoids the browser's "Confirm Form
+// Resubmission" warning on refresh/back after a POST here).
+$error = $_GET['error'] ?? '';
+$success = $_GET['success'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
@@ -26,6 +29,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $success = 'Message status updated.';
         }
     }
+
+    $redirectParams = ['q' => $_GET['q'] ?? ''];
+    if ($error) {
+        $redirectParams['error'] = $error;
+    } elseif ($success) {
+        $redirectParams['success'] = $success;
+    }
+    header('Location: network-messages.php?' . http_build_query(array_filter($redirectParams)));
+    exit;
 }
 
 $search = trim($_GET['q'] ?? '');

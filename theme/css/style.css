@@ -1172,6 +1172,15 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
     max-width: 100%;
     overflow: hidden;
   }
+  /* The "sit flush against the edge, no gutter" rule right below this block
+     is a deliberate full-bleed look for desktop — on a phone it just means
+     the heading/photo/quote text/attribution box all touch the bare screen
+     edge with zero breathing room, which reads as cramped rather than
+     intentional. Give this column back some padding on mobile only. */
+  .hero-section .row.align-items-center > .col-md-3:first-child {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
 }
 
 .hero-section h1,
@@ -1190,6 +1199,8 @@ header .top-header .top-header-icons .list-inline-item:last-child a {
   overflow: visible;
   height: auto;
   line-height: 1.4;
+  margin-top: 20px;
+  border-radius: 6px;
 }
 
 /* Quote styling: bold, italic, white with quotation marks */

@@ -7,11 +7,17 @@
    providing that clearance (the flag banner used to double as this on the
    chat page, back when it was a standalone top strip instead of living
    behind the message list). */
+/* 200px matches .page-title-section's own desktop clearance elsewhere on
+   the site (about.php etc.) — this file's earlier 90px/110px guesses were
+   never actually checked against that real, working value, and were
+   nowhere near enough: the header here is 3 stacked rows (top bar, main
+   nav with the region dropdown, and the Events/Summits/.../About sub-nav),
+   taller than a generic .section assumes. */
 .network-register-section {
-  padding-top: 90px;
+  padding-top: 200px;
 }
 .network-chat-section {
-  padding-top: 110px;
+  padding-top: 220px;
 }
 @media (max-width: 767px) {
   .network-register-section,

@@ -26,7 +26,6 @@ include('config.php');
     <div class="container">
       <h1 class="text-white">About INAfrica</h1>
       <p class="text-white mb-0">A Pan-African, Youth-Led Framework for Sustainable Development and Continental Transformation</p>
-      <p class="text-white mb-0 mt-2"><em>&mdash; Connecting young Africans across the continent in open, thoughtful dialogue, building deeper understanding of Africa and the issues shaping its future &mdash;</em></p>
     </div>
   </section>
 
@@ -40,8 +39,8 @@ include('config.php');
             INAfrica is a Pan-African, youth-led catalyst for sustainable development, socio-economic
             autonomy, and the restoration of Africa's global standing. We empower young Africans to
             become active contributors to the continent's transformation through responsible
-            leadership, strategic dialogue, innovation, research, and practical implementation &mdash;
-            not as a conventional advocacy body, but as a catalytic platform that convenes ideas,
+            leadership, strategic dialogue, innovation, research, and practical implementation, not
+            as a conventional advocacy body, but as a catalytic platform that convenes ideas,
             connects generations of leadership, and translates strategic thinking into measurable
             continental impact.
           </p>
@@ -49,18 +48,18 @@ include('config.php');
       </div>
 
       <div class="row">
-        <div class="col-md-6 mb-4">
+        <div class="col-md-4 mb-4">
           <div class="card h-100 p-4 shadow-sm">
             <i class="ti-target" style="font-size: 34px; color: #2fb44b;"></i>
             <h4 class="mt-3">Our Vision</h4>
             <p class="mb-0">
               To empower the next generation of African leaders to design, champion, and implement
-              indigenous solutions for Africa's shared future &mdash; because durable development
+              indigenous solutions for Africa's shared future, because durable development
               outcomes are best achieved when conceived, owned, and driven by Africans themselves.
             </p>
           </div>
         </div>
-        <div class="col-md-6 mb-4">
+        <div class="col-md-4 mb-4">
           <div class="card h-100 p-4 shadow-sm">
             <i class="ti-book" style="font-size: 34px; color: #2fb44b;"></i>
             <h4 class="mt-3">Our Mission</h4>
@@ -69,6 +68,16 @@ include('config.php');
               sustainable socio-economic transformation. An informed citizenry is better equipped to
               hold institutions accountable, participate meaningfully in policy dialogue, and drive
               inclusive growth.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 p-4 shadow-sm">
+            <i class="ti-comments" style="font-size: 34px; color: #2fb44b;"></i>
+            <h4 class="mt-3">Our Purpose</h4>
+            <p class="mb-0">
+              Connecting young Africans across the continent in open, thoughtful dialogue that
+              builds deeper understanding of Africa and the issues shaping its future.
             </p>
           </div>
         </div>

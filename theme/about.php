@@ -48,7 +48,7 @@ include('config.php');
       </div>
 
       <div class="row">
-        <div class="col-md-4 mb-4">
+        <div class="col-md-6 mb-4">
           <div class="card h-100 p-4 shadow-sm">
             <i class="ti-target" style="font-size: 34px; color: #2fb44b;"></i>
             <h4 class="mt-3">Our Vision</h4>
@@ -59,7 +59,7 @@ include('config.php');
             </p>
           </div>
         </div>
-        <div class="col-md-4 mb-4">
+        <div class="col-md-6 mb-4">
           <div class="card h-100 p-4 shadow-sm">
             <i class="ti-book" style="font-size: 34px; color: #2fb44b;"></i>
             <h4 class="mt-3">Our Mission</h4>
@@ -68,16 +68,6 @@ include('config.php');
               sustainable socio-economic transformation. An informed citizenry is better equipped to
               hold institutions accountable, participate meaningfully in policy dialogue, and drive
               inclusive growth.
-            </p>
-          </div>
-        </div>
-        <div class="col-md-4 mb-4">
-          <div class="card h-100 p-4 shadow-sm">
-            <i class="ti-comments" style="font-size: 34px; color: #2fb44b;"></i>
-            <h4 class="mt-3">Our Purpose</h4>
-            <p class="mb-0">
-              Connecting young Africans across the continent in open, thoughtful dialogue &mdash;
-              building deeper understanding of Africa and the issues shaping its future.
             </p>
           </div>
         </div>

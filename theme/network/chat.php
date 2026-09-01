@@ -22,6 +22,28 @@ $lastId = 0;
 foreach ($initialMessages as $m) {
     $lastId = max($lastId, $m['id']);
 }
+
+// Deep link from a "Share to..." link (?m=<id>) — if that message isn't
+// already within the recent-50 window shown above (an old message someone
+// shared), fetch it specifically so the client always has something to
+// scroll to and highlight, not just a silently-broken link.
+$highlightMessageId = null;
+if (!empty($_GET['m']) && ctype_digit((string) $_GET['m'])) {
+    $highlightMessageId = (int) $_GET['m'];
+    $alreadyShown = false;
+    foreach ($initialMessages as $m) {
+        if ($m['id'] === $highlightMessageId) {
+            $alreadyShown = true;
+            break;
+        }
+    }
+    if (!$alreadyShown) {
+        $shared = networkFetchOneMessage($con, $me['id'], $highlightMessageId);
+        if ($shared) {
+            array_unshift($initialMessages, $shared);
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -97,6 +119,7 @@ foreach ($initialMessages as $m) {
     var MY_USER_ID = <?= (int) $me['id'] ?>;
     var initialMessages = <?= json_encode($initialMessages) ?>;
     var lastId = <?= (int) $lastId ?>;
+    var highlightMessageId = <?= json_encode($highlightMessageId) ?>;
     var replyTo = null; // {id, senderName, preview}
 
     var $messages = document.getElementById('network-messages');
@@ -180,9 +203,17 @@ foreach ($initialMessages as $m) {
       // own dropdown component, already loaded — same data-toggle pattern
       // used elsewhere in the theme) instead of a permanent row of text
       // links under every message.
-      var menuHtml = '';
-      if (!msg.isDeletedForEveryone) {
-        var items = '';
+      // A deleted-for-everyone message still gets a menu — just "Delete for
+      // me", so the tombstone itself can be cleared from your own view
+      // instead of every participant being stuck looking at "This message
+      // was deleted" forever. Nothing else on the menu makes sense for
+      // already-deleted content (no text to copy, nothing to reply to or
+      // forward, and it's already gone for everyone).
+      var items;
+      if (msg.isDeletedForEveryone) {
+        items = '<a class="dropdown-item" data-action="delete-me">Delete for me</a>';
+      } else {
+        items = '';
         if (msg.text) {
           // Copy before Reply, matching WhatsApp's own ordering — only
           // shown when there's actual text to copy (the message itself,
@@ -191,26 +222,27 @@ foreach ($initialMessages as $m) {
         }
         items += '<a class="dropdown-item" data-action="reply">Reply</a>' +
           '<a class="dropdown-item" data-action="forward">Forward</a>' +
+          '<a class="dropdown-item" data-action="share">Share to&hellip;</a>' +
           '<a class="dropdown-item" data-action="delete-me">Delete for me</a>';
         if (mine) {
           items += '<a class="dropdown-item" data-action="delete-everyone">Delete for everyone</a>';
         }
-        // NOT Bootstrap's data-toggle="dropdown" — its JS toggle requires
-        // Popper.js, which isn't loaded anywhere in this theme (bootstrap.min.js
-        // literally contains the string "Popper is required"), so that
-        // toggle silently no-ops on every click. The .dropdown-menu/
-        // .dropdown-item CSS classes are plain CSS with no Popper
-        // involvement, so those are kept; show/hide is a small
-        // dependency-free handler below (see the single document-level
-        // click listener) instead.
-        menuHtml =
-          '<div class="network-message__menu">' +
-            '<button type="button" class="network-message__menu-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Message options">' +
-              '<i class="ti-angle-down"></i>' +
-            '</button>' +
-            '<div class="dropdown-menu dropdown-menu-right">' + items + '</div>' +
-          '</div>';
       }
+      // NOT Bootstrap's data-toggle="dropdown" — its JS toggle requires
+      // Popper.js, which isn't loaded anywhere in this theme (bootstrap.min.js
+      // literally contains the string "Popper is required"), so that
+      // toggle silently no-ops on every click. The .dropdown-menu/
+      // .dropdown-item CSS classes are plain CSS with no Popper
+      // involvement, so those are kept; show/hide is a small
+      // dependency-free handler below (see the single document-level
+      // click listener) instead.
+      var menuHtml =
+        '<div class="network-message__menu">' +
+          '<button type="button" class="network-message__menu-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Message options">' +
+            '<i class="ti-angle-down"></i>' +
+          '</button>' +
+          '<div class="dropdown-menu dropdown-menu-right">' + items + '</div>' +
+        '</div>';
 
       // meta and the menu toggle are flex siblings in a shared header row,
       // not one absolutely-positioned over the other — the previous
@@ -281,6 +313,28 @@ foreach ($initialMessages as $m) {
         $replyPreviewText.innerHTML = '<strong>' + escapeHtml(replyTo.senderName) + '</strong>: ' + escapeHtml(replyTo.preview);
         $replyPreview.style.display = 'block';
         $textInput.focus();
+      } else if (action === 'share') {
+        // Out of the app, to WhatsApp/SMS/email/etc. — "Forward" (above)
+        // stays an internal repost within this chat; this is the separate
+        // "send it as a link to somewhere else" action. The link deep-links
+        // back into this same page (?m=<id>), which chat.php resolves on
+        // load to scroll to and highlight that specific message even if
+        // it's outside the normal recent-history window.
+        var shareUrl = window.location.origin + '/network/chat?m=' + msg.id;
+        var shareText = msg.text || (msg.messageType.charAt(0).toUpperCase() + msg.messageType.slice(1)) + ' on Let Africa Connects';
+        if (navigator.share) {
+          navigator.share({ title: 'Let Africa Connects', text: shareText, url: shareUrl }).catch(function () {
+            // User canceled the native share sheet — not an error, no toast.
+          });
+        } else if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(shareUrl).then(function () {
+            showToast('Link copied — paste it anywhere');
+          }).catch(function () {
+            window.prompt('Copy this link:', shareUrl);
+          });
+        } else {
+          window.prompt('Copy this link:', shareUrl);
+        }
       } else if (action === 'forward') {
         postForm('network/api/forward-message', { message_id: msg.id }).then(function (data) {
           if (data.ok) {
@@ -339,7 +393,28 @@ foreach ($initialMessages as $m) {
     }
     initialMessages.forEach(appendMessage);
     setInterval(poll, 3000);
-    scrollToBottom();
+
+    // A shared link (?m=<id>) scrolls to and briefly highlights that
+    // specific message instead of jumping straight to the bottom like a
+    // normal page load — otherwise the link would silently drop whoever
+    // clicked it into the latest messages instead of the one they were
+    // actually sent.
+    if (highlightMessageId) {
+      var target = $messages.querySelector('[data-message-id="' + highlightMessageId + '"]');
+      if (target) {
+        target.scrollIntoView({ block: 'center' });
+        target.classList.add('network-message--highlighted');
+        setTimeout(function () {
+          target.classList.remove('network-message--highlighted');
+        }, 2500);
+      } else {
+        // Message no longer exists/visible to this viewer (deleted, or
+        // hidden via their own "delete for me") — fall back to normal.
+        scrollToBottom();
+      }
+    } else {
+      scrollToBottom();
+    }
 
     // Per-message options menu: one delegated listener handles every
     // toggle button (present and future — new messages keep arriving via

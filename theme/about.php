@@ -26,6 +26,7 @@ include('config.php');
     <div class="container">
       <h1 class="text-white">About INAfrica</h1>
       <p class="text-white mb-0">A Pan-African, Youth-Led Framework for Sustainable Development and Continental Transformation</p>
+      <p class="text-white mb-0 mt-2"><em>&mdash; Connecting young Africans across the continent in open, thoughtful dialogue, building deeper understanding of Africa and the issues shaping its future &mdash;</em></p>
     </div>
   </section>
 

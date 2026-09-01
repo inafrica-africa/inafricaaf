@@ -286,11 +286,63 @@ if (!empty($_GET['m']) && ctype_digit((string) $_GET['m'])) {
     function showToast(text) {
       var toast = document.createElement('div');
       toast.textContent = text;
-      toast.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);' +
-        'background:rgba(0,0,0,.8);color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;' +
-        'z-index:2000;pointer-events:none;';
+      toast.className = 'network-toast';
       document.body.appendChild(toast);
       setTimeout(function () { toast.remove(); }, 1500);
+    }
+
+    // In-app replacements for window.alert/confirm/prompt — this page never
+    // uses the browser's own native dialogs, only its own UI.
+    function showInfoModal(message) {
+      var overlay = document.createElement('div');
+      overlay.className = 'network-modal-overlay';
+      overlay.innerHTML =
+        '<div class="network-modal">' +
+          '<p>' + escapeHtml(message) + '</p>' +
+          '<div class="network-modal-actions"><button type="button" class="btn btn-primary btn-sm" data-modal="ok">OK</button></div>' +
+        '</div>';
+      document.body.appendChild(overlay);
+      function close() { overlay.remove(); }
+      overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+      overlay.querySelector('[data-modal="ok"]').addEventListener('click', close);
+    }
+
+    function showConfirmModal(message, confirmLabel) {
+      return new Promise(function (resolve) {
+        var overlay = document.createElement('div');
+        overlay.className = 'network-modal-overlay';
+        overlay.innerHTML =
+          '<div class="network-modal">' +
+            '<p>' + escapeHtml(message) + '</p>' +
+            '<div class="network-modal-actions">' +
+              '<button type="button" class="btn btn-light btn-sm" data-modal="cancel">Cancel</button>' +
+              '<button type="button" class="btn btn-danger btn-sm" data-modal="ok">' + escapeHtml(confirmLabel || 'Delete') + '</button>' +
+            '</div>' +
+          '</div>';
+        document.body.appendChild(overlay);
+        function finish(result) { overlay.remove(); resolve(result); }
+        overlay.addEventListener('click', function (e) { if (e.target === overlay) finish(false); });
+        overlay.querySelector('[data-modal="cancel"]').addEventListener('click', function () { finish(false); });
+        overlay.querySelector('[data-modal="ok"]').addEventListener('click', function () { finish(true); });
+      });
+    }
+
+    function showLinkModal(url) {
+      var overlay = document.createElement('div');
+      overlay.className = 'network-modal-overlay';
+      overlay.innerHTML =
+        '<div class="network-modal">' +
+          '<p>Copy this link to share it:</p>' +
+          '<input type="text" class="form-control" readonly value="' + escapeHtml(url) + '">' +
+          '<div class="network-modal-actions"><button type="button" class="btn btn-primary btn-sm" data-modal="close">Close</button></div>' +
+        '</div>';
+      document.body.appendChild(overlay);
+      function close() { overlay.remove(); }
+      overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+      overlay.querySelector('[data-modal="close"]').addEventListener('click', close);
+      var input = overlay.querySelector('input');
+      input.focus();
+      input.select();
     }
 
     function handleAction(action, msg) {
@@ -299,10 +351,10 @@ if (!empty($_GET['m']) && ctype_digit((string) $_GET['m'])) {
           navigator.clipboard.writeText(msg.text).then(function () {
             showToast('Copied');
           }).catch(function () {
-            window.alert('Could not copy. Long-press the message text to copy it manually.');
+            showInfoModal('Could not copy. Long-press the message text to copy it manually.');
           });
         } else {
-          window.alert('Copy is not supported in this browser. Long-press the message text to copy it manually.');
+          showInfoModal('Copy is not supported in this browser. Long-press the message text to copy it manually.');
         }
       } else if (action === 'reply') {
         replyTo = {
@@ -330,47 +382,47 @@ if (!empty($_GET['m']) && ctype_digit((string) $_GET['m'])) {
           navigator.clipboard.writeText(shareUrl).then(function () {
             showToast('Link copied — paste it anywhere');
           }).catch(function () {
-            window.prompt('Copy this link:', shareUrl);
+            showLinkModal(shareUrl);
           });
         } else {
-          window.prompt('Copy this link:', shareUrl);
+          showLinkModal(shareUrl);
         }
       } else if (action === 'forward') {
         postForm('network/api/forward-message', { message_id: msg.id }).then(function (data) {
           if (data.ok) {
             appendMessage(data.message);
           } else {
-            window.alert(data.error || 'Could not forward this message.');
+            showInfoModal(data.error || 'Could not forward this message.');
           }
         });
       } else if (action === 'delete-me') {
-        if (!window.confirm('Delete this message for you? Other people will still see it.')) {
-          return;
-        }
-        postForm('network/api/delete-message', { message_id: msg.id, mode: 'me' }).then(function (data) {
-          if (data.ok) {
-            var el = $messages.querySelector('[data-message-id="' + msg.id + '"]');
-            if (el) {
-              el.remove();
+        showConfirmModal('Delete this message for you? Other people will still see it.', 'Delete').then(function (confirmed) {
+          if (!confirmed) return;
+          postForm('network/api/delete-message', { message_id: msg.id, mode: 'me' }).then(function (data) {
+            if (data.ok) {
+              var el = $messages.querySelector('[data-message-id="' + msg.id + '"]');
+              if (el) {
+                el.remove();
+              }
+            } else {
+              showInfoModal(data.error || 'Could not delete this message.');
             }
-          } else {
-            window.alert(data.error || 'Could not delete this message.');
-          }
+          });
         });
       } else if (action === 'delete-everyone') {
-        if (!window.confirm('Delete this message for everyone?')) {
-          return;
-        }
-        postForm('network/api/delete-message', { message_id: msg.id, mode: 'everyone' }).then(function (data) {
-          if (data.ok) {
-            var el = $messages.querySelector('[data-message-id="' + msg.id + '"]');
-            if (el) {
-              msg.isDeletedForEveryone = true;
-              el.replaceWith(renderMessage(msg));
+        showConfirmModal('Delete this message for everyone?', 'Delete').then(function (confirmed) {
+          if (!confirmed) return;
+          postForm('network/api/delete-message', { message_id: msg.id, mode: 'everyone' }).then(function (data) {
+            if (data.ok) {
+              var el = $messages.querySelector('[data-message-id="' + msg.id + '"]');
+              if (el) {
+                msg.isDeletedForEveryone = true;
+                el.replaceWith(renderMessage(msg));
+              }
+            } else {
+              showInfoModal(data.error || 'Could not delete this message.');
             }
-          } else {
-            window.alert(data.error || 'Could not delete this message.');
-          }
+          });
         });
       }
     }
@@ -467,7 +519,7 @@ if (!empty($_GET['m']) && ctype_digit((string) $_GET['m'])) {
         video.onloadedmetadata = function () {
           window.URL.revokeObjectURL(video.src);
           if (video.duration > 90) {
-            window.alert('Videos must be 90 seconds or shorter.');
+            showInfoModal('Videos must be 90 seconds or shorter.');
             $mediaInput.value = '';
             $mediaPreview.textContent = '';
           } else {
@@ -507,7 +559,7 @@ if (!empty($_GET['m']) && ctype_digit((string) $_GET['m'])) {
             replyTo = null;
             $replyPreview.style.display = 'none';
           } else {
-            window.alert(data.error || 'Could not send that message.');
+            showInfoModal(data.error || 'Could not send that message.');
           }
         });
       }
@@ -524,7 +576,7 @@ if (!empty($_GET['m']) && ctype_digit((string) $_GET['m'])) {
           .then(function (res) { return res.json(); })
           .then(function (data) {
             if (!data.ok) {
-              window.alert(data.error || 'Could not upload that file.');
+              showInfoModal(data.error || 'Could not upload that file.');
               return;
             }
             send(data);

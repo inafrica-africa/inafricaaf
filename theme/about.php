@@ -6,7 +6,7 @@ include('config.php');
 <head>
   <meta charset="utf-8">
   <title>About Us | INAfrica</title>
-  <meta name="description" content="INAfrica: A Pan-African, youth-led framework for sustainable development and continental transformation.">
+  <meta name="description" content="INAfrica: An African, youth-led framework for sustainable development and continental transformation.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <link rel="stylesheet" href="plugins/bootstrap/bootstrap.min.css">
   <link rel="stylesheet" href="plugins/themify-icons/themify-icons.css">
@@ -14,7 +14,7 @@ include('config.php');
   <link rel="shortcut icon" href="images/logo.png" type="image/x-icon">
   <?php renderMetaTags(
     'About Us | INAfrica',
-    'INAfrica: A Pan-African, youth-led framework for sustainable development and continental transformation.',
+    'INAfrica: An African, youth-led framework for sustainable development and continental transformation.',
     'images/logo.png',
     '/about'
   ); ?>
@@ -25,7 +25,7 @@ include('config.php');
   <section class="page-title-section bg-cover overlay" style="background-image: url('images/banner/banner-1.jpg');">
     <div class="container">
       <h1 class="text-white">About INAfrica</h1>
-      <p class="text-white mb-0">A Pan-African, Youth-Led Framework for Sustainable Development and Continental Transformation</p>
+      <p class="text-white mb-0">An African, Youth-Led Framework for Sustainable Development and Continental Transformation</p>
     </div>
   </section>
 
@@ -36,7 +36,7 @@ include('config.php');
         <div class="col-lg-9 mx-auto text-center mb-4">
           <h3 class="section-title">Who We Are</h3>
           <p>
-            INAfrica is a Pan-African, youth-led catalyst for sustainable development, socio-economic
+            INAfrica is an African, youth-led catalyst for sustainable development, socio-economic
             autonomy, and the restoration of Africa's global standing. We empower young Africans to
             become active contributors to the continent's transformation through responsible
             leadership, strategic dialogue, innovation, research, and practical implementation, not
@@ -194,7 +194,7 @@ include('config.php');
           <h3 class="section-title">Continental Flagship Platforms</h3>
           <p>
             We deliver our Open Dialogue and Strategic Initiatives through flagship convening
-            platforms, each targeting a distinct constituency across the Pan-African ecosystem.
+            platforms, each targeting a distinct constituency across the African ecosystem.
           </p>
         </div>
       </div>
@@ -246,7 +246,7 @@ include('config.php');
               Our primary vehicle for structured, ongoing youth engagement, built on six pillars:
               accountable and inclusive governance; African heritage and cultural capital;
               youth-led peacebuilding and regional security; digital transformation aligned with
-              AU Agenda 2063; translating Pan-Africanism into practical solutions; and inclusive
+              AU Agenda 2063; translating African unity into practical solutions; and inclusive
               economic growth through intra-African trade.
             </p>
           </div>

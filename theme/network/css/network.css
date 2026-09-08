@@ -213,6 +213,63 @@
   border-radius: 8px;
   display: block;
 }
+.network-message__image {
+  cursor: zoom-in;
+}
+
+/* Full-screen image viewer opened by tapping a shared image (see
+   openImageViewer() in chat.php) — dark backdrop, image scaled to fit, a
+   close button and an explicit save/download button, matching WhatsApp's
+   own tap-to-view-full-size behavior. */
+.network-media-viewer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.92);
+  z-index: 2200;
+  display: flex;
+  flex-direction: column;
+}
+.network-media-viewer-toolbar {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+}
+.network-media-viewer-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255,255,255,.15);
+  color: #fff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+}
+.network-media-viewer-btn:hover,
+.network-media-viewer-btn:focus {
+  background: rgba(255,255,255,.3);
+  color: #fff;
+  text-decoration: none;
+}
+.network-media-viewer-body {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 0 16px 16px;
+}
+.network-media-viewer-body img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+}
 /* Per-message options menu: a small caret in the bubble's corner (matching
    the standard chat-app affordance) that opens a dropdown, replacing what
    used to be a permanent row of "Reply / Forward / Delete for me / Delete

@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /network/
+
+Sitemap: https://inafricaac.org/sitemap.xml

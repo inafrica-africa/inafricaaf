@@ -127,7 +127,7 @@ if ($editId > 0) {
 }
 
 $documents = [];
-$result = mysqli_query($con, "SELECT id, Title, DocType, Language, FilePath, UploadDate, Is_Active FROM tbldocuments ORDER BY UploadDate DESC");
+$result = mysqli_query($con, "SELECT id, Title, DocType, Language, FilePath, UploadDate, Is_Active, viewCounter, share_count FROM tbldocuments ORDER BY UploadDate DESC");
 if ($result) {
     $documents = mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
@@ -207,19 +207,23 @@ require_once __DIR__ . '/../includes/leftsidebar.php';
                                         <th>Type</th>
                                         <th>Language</th>
                                         <th>Date</th>
+                                        <th>Views</th>
+                                        <th>Shares</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php if (empty($documents)): ?>
-                                        <tr><td colspan="6" class="text-center text-muted">No documents yet.</td></tr>
+                                        <tr><td colspan="8" class="text-center text-muted">No documents yet.</td></tr>
                                     <?php else: foreach ($documents as $doc): ?>
                                         <tr>
                                             <td><?= htmlspecialchars($doc['Title']) ?></td>
                                             <td><?= htmlspecialchars($doc['DocType']) ?></td>
                                             <td><?= htmlspecialchars($doc['Language']) ?></td>
                                             <td><?= date('M j, Y', strtotime($doc['UploadDate'])) ?></td>
+                                            <td><?= number_format((int) $doc['viewCounter']) ?></td>
+                                            <td><?= number_format((int) $doc['share_count']) ?></td>
                                             <td>
                                                 <?php if ($doc['Is_Active']): ?>
                                                     <span class="badge badge-success">Active</span>

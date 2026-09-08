@@ -8,7 +8,7 @@ if (!in_array($type, $validTypes, true)) {
 }
 
 $documents = [];
-$stmt = $con->prepare("SELECT Title, Language, Description, FilePath, ThumbnailPath, UploadDate FROM tbldocuments WHERE DocType = ? AND Is_Active = 1 ORDER BY UploadDate DESC");
+$stmt = $con->prepare("SELECT id, Title, Language, Description, FilePath, ThumbnailPath, UploadDate, viewCounter, share_count FROM tbldocuments WHERE DocType = ? AND Is_Active = 1 ORDER BY UploadDate DESC");
 $stmt->bind_param("s", $type);
 $stmt->execute();
 $documents = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -68,7 +68,12 @@ $pageTitle = $typeLabels[$type];
                 <?php if (!empty($doc['Description'])): ?>
                   <p class="card-text"><?= htmlspecialchars($doc['Description']) ?></p>
                 <?php endif; ?>
-                <a href="admin/documents/<?= htmlspecialchars($doc['FilePath']) ?>" class="btn btn-primary btn-sm" target="_blank">Download</a>
+                <p class="card-text text-muted small">
+                  <i class="ti-eye"></i> <?= number_format((int) $doc['viewCounter']) ?> views
+                  &middot; <i class="ti-share"></i> <?= number_format((int) $doc['share_count']) ?> shares
+                </p>
+                <a href="view-document?id=<?= (int) $doc['id'] ?>" class="btn btn-primary btn-sm" target="_blank" rel="noopener">View</a>
+                <a href="document-details?id=<?= (int) $doc['id'] ?>" class="btn btn-outline-secondary btn-sm" title="Get a shareable link with preview image"><i class="ti-share"></i> Share</a>
               </div>
             </div>
           </div>

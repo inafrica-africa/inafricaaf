@@ -170,12 +170,45 @@ if (!empty($_GET['m']) && ctype_digit((string) $_GET['m'])) {
       }
       var src = 'network/media/' + encodeURIComponent(msg.mediaPath);
       if (msg.messageType === 'image') {
-        return '<div class="network-message__media"><img src="' + src + '" alt="Shared image"></div>';
+        return '<div class="network-message__media"><img src="' + src + '" data-filename="' + escapeHtml(msg.mediaPath) +
+          '" alt="Shared image" class="network-message__image"></div>';
       }
       if (msg.messageType === 'video') {
         return '<div class="network-message__media"><video src="' + src + '" controls></video></div>';
       }
       return '';
+    }
+
+    // Full-screen tap-to-view for shared images, matching WhatsApp: tap the
+    // thumbnail in the bubble to see it full-size, with an explicit save
+    // button rather than relying on a browser's right-click/long-press menu
+    // (which mobile users often don't discover on their own).
+    function openImageViewer(src, filename) {
+      var overlay = document.createElement('div');
+      overlay.className = 'network-media-viewer-overlay';
+      overlay.innerHTML =
+        '<div class="network-media-viewer-toolbar">' +
+          '<button type="button" class="network-media-viewer-btn" data-viewer-action="close" aria-label="Close"><i class="ti-close"></i></button>' +
+          '<a class="network-media-viewer-btn" data-viewer-action="save" href="' + src + '" download="' + escapeHtml(filename || 'image') + '" aria-label="Save image"><i class="ti-download"></i></a>' +
+        '</div>' +
+        '<div class="network-media-viewer-body"><img src="' + src + '" alt="Shared image"></div>';
+      document.body.appendChild(overlay);
+      function close() { overlay.remove(); }
+      overlay.querySelector('[data-viewer-action="close"]').addEventListener('click', close);
+      // Tapping the dark backdrop closes it too (not the image or toolbar
+      // themselves), same as WhatsApp's own viewer.
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay || e.target.classList.contains('network-media-viewer-body')) {
+          close();
+        }
+      });
+      function onKeydown(e) {
+        if (e.key === 'Escape') {
+          close();
+          document.removeEventListener('keydown', onKeydown);
+        }
+      }
+      document.addEventListener('keydown', onKeydown);
     }
 
     function renderMessage(msg) {
@@ -271,6 +304,12 @@ if (!empty($_GET['m']) && ctype_digit((string) $_GET['m'])) {
       wrap.querySelectorAll('[data-action]').forEach(function (el) {
         el.addEventListener('click', function () {
           handleAction(el.getAttribute('data-action'), msg);
+        });
+      });
+
+      wrap.querySelectorAll('.network-message__image').forEach(function (img) {
+        img.addEventListener('click', function () {
+          openImageViewer(img.getAttribute('src'), img.getAttribute('data-filename'));
         });
       });
 
